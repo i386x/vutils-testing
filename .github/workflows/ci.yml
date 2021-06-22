@@ -39,11 +39,13 @@ jobs:
       - name: Run tox
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COVERALLS_CMD: coveralls
           COVERALLS_SERVICE_NAME: github
           COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
           COVERALLS_PARALLEL: true
         run: |
+          PYVER=${COVERALLS_FLAG_NAME}
+          BASEDIR=.tox/py${PYVER//.}/lib/python${PYVER}/site-packages/
+          export COVERALLS_CMD="coveralls --basedir=${BASEDIR}"
           tox -e py${COVERALLS_FLAG_NAME//.},linters
 
   finish:
