@@ -45,7 +45,7 @@ jobs:
         run: |
           PYVER=${COVERALLS_FLAG_NAME}
           BASEDIR=.tox/py${PYVER//.}/lib/python${PYVER}/site-packages/
-          export COVERALLS_CMD="coveralls --basedir=${BASEDIR}"
+          export COVERALLS_CMD="coveralls --basedir=${BASEDIR} --srcdir=src"
           tox -e py${COVERALLS_FLAG_NAME//.},linters
 
   finish:
