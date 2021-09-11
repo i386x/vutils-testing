@@ -6,6 +6,6 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Holds vutils.testing version."""
+"""Holds :mod:`vutils.testing` version."""
 
 __version__: str = "0.0.0"
