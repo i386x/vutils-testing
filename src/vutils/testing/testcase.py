@@ -6,14 +6,14 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Extended :class:`unittest.TestCase`."""
+"""Extended `unittest.TestCase`."""
 
 import unittest
 import unittest.mock
 
 
 class TestCase(unittest.TestCase):
-    """Extended :class:`unittest.TestCase`."""
+    """Extended `unittest.TestCase`."""
 
     @staticmethod
     def assert_called_with(

@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Test :mod:`vutils.testing.version` module."""
+"""Test `vutils.testing.version` module."""
 
 import unittest
 
@@ -15,6 +15,8 @@ from vutils.testing.version import __version__
 
 class VersionTestCase(unittest.TestCase):
     """Test case for version."""
+
+    __slots__ = ()
 
     def test_version(self):
         """Test if version is defined properly."""

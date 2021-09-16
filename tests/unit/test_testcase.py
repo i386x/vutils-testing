@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Test :mod:`vutils.testing.testcase` module."""
+"""Test `vutils.testing.testcase` module."""
 
 import unittest.mock
 
@@ -14,10 +14,12 @@ from vutils.testing.testcase import TestCase
 
 
 class TestCaseTestCase(TestCase):
-    """Test case for :class:`TestCase`."""
+    """Test case for `TestCase`."""
+
+    __slots__ = ()
 
     def test_called_with(self):
-        """Test :meth:`assert_called_with` method."""
+        """Test `TestCase.assert_called_with` method."""
         mock = unittest.mock.Mock()
 
         mock.foo()
