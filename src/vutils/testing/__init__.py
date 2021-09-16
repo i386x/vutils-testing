@@ -6,4 +6,4 @@
 #
 # SPDX-License-Identifier: MIT
 #
-""":mod:`vutils.testing` package."""
+"""`vutils.testing` package."""
