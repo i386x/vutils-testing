@@ -9,15 +9,20 @@
 """Extended `unittest.TestCase`."""
 
 import unittest
-import unittest.mock
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
 
 
 class TestCase(unittest.TestCase):
     """Extended `unittest.TestCase`."""
 
+    __slots__ = ()
+
     @staticmethod
     def assert_called_with(
-        mock: unittest.mock.Mock, *args: object, **kwargs: object
+        mock: "Mock", *args: object, **kwargs: object
     ) -> None:
         """
         Check and reset the mock call.

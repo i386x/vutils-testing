@@ -8,12 +8,11 @@
 #
 """Test `vutils.testing.version` module."""
 
-import unittest
-
+from vutils.testing.testcase import TestCase
 from vutils.testing.version import __version__
 
 
-class VersionTestCase(unittest.TestCase):
+class VersionTestCase(TestCase):
     """Test case for version."""
 
     __slots__ = ()
