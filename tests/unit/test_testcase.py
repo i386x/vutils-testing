@@ -11,6 +11,11 @@
 import unittest.mock
 
 from vutils.testing.testcase import TestCase
+from vutils.testing.utils import cover_typing
+
+from .common import SYMBOLS
+
+cover_typing("vutils.testing.testcase", SYMBOLS)
 
 
 class TestCaseTestCase(TestCase):
