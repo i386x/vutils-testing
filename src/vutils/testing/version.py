@@ -8,4 +8,4 @@
 #
 """Holds `vutils.testing` version."""
 
-__version__: str = "0.1.0"
+__version__: str = "0.2.0"
