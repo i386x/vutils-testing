@@ -36,3 +36,15 @@ class TestCase(unittest.TestCase):
         """
         mock.assert_called_once_with(*args, **kwargs)
         mock.reset_mock()
+
+    @staticmethod
+    def assert_not_called(mock: "Mock") -> None:
+        """
+        Check that *mock* has not been called.
+
+        :param mock: The mock object
+
+        Check whether the mock object has not been called and reset it.
+        """
+        mock.assert_not_called()
+        mock.reset_mock()

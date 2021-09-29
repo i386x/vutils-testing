@@ -8,8 +8,7 @@
 #
 """Test `vutils.testing.testcase` module."""
 
-import unittest.mock
-
+from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
 from vutils.testing.utils import cover_typing
 
@@ -23,9 +22,9 @@ class TestCaseTestCase(TestCase):
 
     __slots__ = ()
 
-    def test_called_with(self):
+    def test_assert_called_with(self):
         """Test `TestCase.assert_called_with` method."""
-        mock = unittest.mock.Mock()
+        mock = make_mock(["foo"])
 
         mock.foo()
         self.assert_called_with(mock.foo)
@@ -38,3 +37,9 @@ class TestCaseTestCase(TestCase):
 
         mock.foo(5, quux=6)
         self.assert_called_with(mock.foo, 5, quux=6)
+
+    def test_assert_not_called(self):
+        """Test `TestCase.assert_not_called` method."""
+        mock = make_mock(["foo"])
+
+        self.assert_not_called(mock.foo)
