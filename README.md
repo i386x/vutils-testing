@@ -50,8 +50,7 @@ my_fourth_class = make_type("MyFourthClass", bases=A, foo=42)
 `make_mock`, `make_callable`, and `PatcherFactory` from `vutils.testing.mock`
 allow to create mock objects and patching things.
 
-`make_mock()` creates just simple mock object (the instance of
-`unittest.mock.Mock`)
+`make_mock(*args, **kwargs)` is a shortcut for `unittest.mock.Mock`
 
 `make_callable(x)` creates also instance of `unittest.mock.Mock`, but it
 specifies its function-related behavior: if `x` is callable, it is used to do a
@@ -137,11 +136,19 @@ Module `vutils.testing.testcase` provides `TestCase` which is a subclass of
   ```python
   class ExampleTestCase(TestCase):
       def test_assert_called_with(self):
-          mock = unittest.mock.Mock()
+          mock = make_mock(["foo"])
 
           mock.foo(1, 2, bar=3)
           self.assert_called_with(mock, 1, 2, bar=3)
 
           mock.foo(4)
           self.assert_called_with(mock, 4)
+  ```
+* `assert_not_called` - assert that the mock object has not been called:
+  ```python
+  class ExampleTestCase(TestCase):
+      def test_assert_not_called(self):
+          mock = make_mock(["foo"])
+
+          self.assert_not_called(mock.foo)
   ```
