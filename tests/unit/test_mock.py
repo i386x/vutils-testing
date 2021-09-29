@@ -38,6 +38,21 @@ class MakeMockTestCase(TestCase):
         """
         self.assertIsInstance(make_mock(), unittest.mock.Mock)
 
+    def test_make_mock_with_args(self):
+        """
+        Test `make_mock` with arguments.
+
+        Test whether arguments are passed to `unittest.mock.Mock`.
+        """
+        text = "abc"
+        mock = make_mock(["write"])
+
+        with self.assertRaises(AttributeError):
+            mock.write_()
+
+        mock.write(text)
+        self.assert_called_with(mock.write, text)
+
 
 class MakeCallableTestCase(TestCase):
     """Test case for `make_callable`."""

@@ -19,13 +19,17 @@ else:
     _make_patch = unittest.mock.patch
 
 
-def make_mock() -> "Mock":
+def make_mock(*args: object, **kwargs: object) -> "Mock":
     """
-    Make the plain `unittest.mock.Mock` object.
+    Make the `unittest.mock.Mock` object.
 
+    :param args: Positional arguments to be passed to the `unittest.mock.Mock`
+        constructor
+    :param kwargs: Key-value arguments to be passed to the `unittest.mock.Mock`
+        constructor
     :return: the `unittest.mock.Mock` object
     """
-    return unittest.mock.Mock()
+    return unittest.mock.Mock(*args, **kwargs)
 
 
 def make_callable(returns: "_ReturnsType" = None) -> "Mock":
