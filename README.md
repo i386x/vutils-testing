@@ -121,9 +121,44 @@ from foopkg.foo import func_a
 # Use after imports so module cache is populated with proper modules. When
 # called, following happens:
 # - typing.TYPE_CHECKING is patched to True
-# - foopkg is patched with _A, _B, and _C symbols if they are not exist
+# - foopkg is patched with _A, _B, and _C symbols if they do not exist
 # - finally, foopkg.foo is reloaded
 cover_typing("foopkg.foo", ["_A", "_B", "_C"])
+```
+
+### Deferred `assertRaises`
+
+Sometimes there are callable objects with a very similar prototypes and
+behavior so they can be run and checked with one universal function. However,
+if one of them raises an exception under specific circumstances, this must be
+also handled by the universal function, which adds to its complexity. For this
+reason, `vutils.testing.utils` introduces `AssertRaises` class which wraps
+exception raising assertions:
+```python
+class FooError(Exception):
+    detail = "foo"
+
+def func_a(obj):
+    obj.foo = 42
+
+def func_b(obj):
+    func_a(obj)
+    raise FooError()
+
+def Foo(TestCase):
+    def run_and_check(self, func):
+        obj = make_mock()
+        func(obj)
+        self.assertEqual(obj.foo, 42)
+
+    def test_func(self):
+        wfunc_b = AssertRaises(self, func_b, FooError)
+
+        self.run_and_check(func_a)
+        # Catch and store FooError:
+        self.run_and_check(wfunc_b)
+        # Check the caught exception:
+        self.assertEqual(wfunc_b.get_exception().detail, "foo")
 ```
 
 ### Enhanced `TestCase`
