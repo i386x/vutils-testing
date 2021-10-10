@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.4.0
+
+* new class `AssertRaises`
+
 ## 0.3.0
 
 * `make_mock` now passes its arguments to `unittest.mock.Mock`
