@@ -8,13 +8,17 @@
 #
 """Type hints for `vutils.testing`."""
 
-from typing import Callable, Dict, Optional, Tuple, Union
+from typing import Callable, Dict, Optional, Tuple, Type, Union
 from unittest.mock import Mock, _patch
 
 _ReturnsType = Optional[Union[object, Callable[[object], object]]]
 _SetupFuncType = Optional[Callable[[Union[Mock, object]], None]]
 _BasesType = Optional[Union[type, Tuple[type, ...]]]
 _MembersType = Optional[Dict[str, object]]
+_ExcSpecType = Union[Type[Exception], Tuple[Type[Exception], ...]]
+
+class _FuncType:
+    def __call__(self, *args: object, **kwargs: object) -> object: ...
 
 def _make_patch(
     target: object, mock: Union[Mock, object], **kwargs: object

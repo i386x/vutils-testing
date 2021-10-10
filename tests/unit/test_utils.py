@@ -8,10 +8,11 @@
 #
 """Test `vutils.testing.utils` module."""
 
+from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
-from vutils.testing.utils import cover_typing, make_type
+from vutils.testing.utils import AssertRaises, cover_typing, make_type
 
-from .common import SYMBOLS
+from .common import FOO_CONSTANT, SYMBOLS, FooError, func_a, func_b
 
 cover_typing("vutils.testing.utils", SYMBOLS)
 
@@ -65,3 +66,28 @@ class MakeTypeTestCase(TestCase):
         self.assertEqual(type_a.a, 1)
         self.assertEqual(type_b.a, 1)
         self.assertEqual(type_b.b, 2)
+
+
+class AssertRaisesTestCase(TestCase):
+    """Test case for `AssertRaises`."""
+
+    __slots__ = ()
+
+    def run_and_verify(self, func):
+        """
+        Run *func* and verify results.
+
+        :param func: The function to run
+        """
+        mock = make_mock()
+        func(mock)
+        self.assertEqual(mock.foo, FOO_CONSTANT)
+
+    def test_assert_raises(self):
+        """Test `AssertRaises` works as expected."""
+        wfunc_b = AssertRaises(self, func_b, FooError)
+
+        self.run_and_verify(func_a)
+        self.run_and_verify(wfunc_b)
+        self.assertEqual(wfunc_b.get_exception().detail, FOO_CONSTANT)
+        self.assertIsNone(wfunc_b.get_exception())
