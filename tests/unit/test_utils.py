@@ -8,11 +8,26 @@
 #
 """Test `vutils.testing.utils` module."""
 
+import sys
+
 from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
-from vutils.testing.utils import AssertRaises, cover_typing, make_type
+from vutils.testing.utils import (
+    AssertRaises,
+    LazyInstance,
+    cover_typing,
+    make_type,
+)
 
-from .common import FOO_CONSTANT, SYMBOLS, FooError, func_a, func_b
+from .common import (
+    FOO_CONSTANT,
+    SYMBOLS,
+    FooError,
+    StderrPatcher,
+    StderrWriter,
+    func_a,
+    func_b,
+)
 
 cover_typing("vutils.testing.utils", SYMBOLS)
 
@@ -66,6 +81,39 @@ class MakeTypeTestCase(TestCase):
         self.assertEqual(type_a.a, 1)
         self.assertEqual(type_b.a, 1)
         self.assertEqual(type_b.b, 2)
+
+
+class LazyInstanceTestCase(TestCase):
+    """Test case for `LazyInstance`."""
+
+    __slots__ = ()
+
+    def test_lazy_initialization(self):
+        """Test lazy initialization."""
+        code = 42
+        label = "LABEL"
+        message = "Hello!"
+        patcher = StderrPatcher()
+        writer = LazyInstance(StderrWriter).create(code, label=label)
+        write_func = writer.write
+
+        with patcher.patch():
+            write_func(message)
+
+        self.assertIs(writer.stream, sys.stderr)
+        self.assertEqual(
+            patcher.stream.getvalue(),
+            StderrWriter.format(code, label, message),
+        )
+        self.assertIsNot(writer.get_instance(), writer.get_instance())
+
+    def test_instance_caching(self):
+        """Test instance caching."""
+        writer = LazyInstance(StderrWriter, initialize_once=True).create(
+            1, "FOO"
+        )
+
+        self.assertIs(writer.get_instance(), writer.get_instance())
 
 
 class AssertRaisesTestCase(TestCase):
