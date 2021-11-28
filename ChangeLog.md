@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.0
+
+* new class `LazyInstance`
+
 ## 0.4.0
 
 * new class `AssertRaises`
