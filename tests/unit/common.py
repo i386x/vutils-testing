@@ -8,6 +8,11 @@
 #
 """Shared test code and data."""
 
+import io
+import sys
+
+from vutils.testing.mock import PatcherFactory
+
 SYMBOLS = (
     "_ReturnsType",
     "_SetupFuncType",
@@ -33,6 +38,54 @@ class FooError(Exception):
         """
         Exception.__init__(self, detail)
         self.detail = detail
+
+
+class StderrPatcher(PatcherFactory):
+    """`sys.stderr` patcher."""
+
+    __slots__ = ("stream",)
+
+    def setup(self):
+        """Set up the patcher."""
+        self.stream = io.StringIO()
+        self.add_spec("sys.stderr", new=self.stream)
+
+
+class StderrWriter:
+    """Dummy standard error output writer."""
+
+    __slots__ = ("stream", "code", "label")
+
+    def __init__(self, code, label=""):
+        """
+        Initialize the writer.
+
+        :param code: The code
+        :param label: The label
+        """
+        self.stream = sys.stderr
+        self.code = code
+        self.label = label
+
+    @staticmethod
+    def format(code, label, text):
+        """
+        Format the message.
+
+        :param code: The code
+        :param label: The label
+        :param text: The text
+        :return: formatted message
+        """
+        return f"({code})[{label}] {text}\n"
+
+    def write(self, text):
+        """
+        Write *text* to stream.
+
+        :param text: The text
+        """
+        self.stream.write(self.format(self.code, self.label, text))
 
 
 def func_a(mock):

@@ -9,7 +9,7 @@
 """Miscellaneous utilities."""
 
 import importlib
-from typing import TYPE_CHECKING, Iterable, Optional
+from typing import TYPE_CHECKING, Dict, Iterable, Optional, Tuple, Union, cast
 
 from vutils.testing.mock import PatcherFactory
 
@@ -72,6 +72,192 @@ def make_type(
     if members is None:
         members = {}
     return type(name, bases, members, **kwargs)
+
+
+class LazyInstanceMethod:
+    """Lazy instance method."""
+
+    __slots__ = ("__owner", "__name")
+
+    def __init__(self, owner: "LazyInstanceProxy", name: str) -> None:
+        """
+        Initialize the method wrapper.
+
+        :param owner: The owner of the lazy instance method
+        :param name: The name of the method
+        """
+        self.__owner: "LazyInstanceProxy" = owner
+        self.__name: str = name
+
+    def __call__(self, *args: object, **kwargs: object) -> object:
+        """
+        Delegate the call to the proper method of the instance.
+
+        :param args: Arguments passed to the method
+        :param kwargs: Key-value arguments passed to the method
+        :return: the value returned by the method
+        """
+        inst: object = self.__owner.get_instance()
+        return cast("_FuncType", getattr(inst, self.__name))(*args, **kwargs)
+
+
+class LazyInstanceProxy:
+    """Lazy instance proxy."""
+
+    __slots__ = ("__owner", "__args", "__kwargs")
+
+    def __init__(
+        self,
+        owner: "LazyInstance",
+        args: Tuple[object, ...],
+        kwargs: Dict[str, object],
+    ) -> None:
+        """
+        Initialize the proxy.
+
+        :param owner: The owner of the proxy
+        :param args: Arguments to be passed to the constructor during the
+            initialization of the instance
+        :param kwargs: Key-value arguments to be passed to the constructor
+            during the initialization of the instance
+        """
+        self.__owner: "LazyInstance" = owner
+        self.__args: Tuple[object, ...] = args
+        self.__kwargs: Dict[str, object] = kwargs
+
+    def get_instance(self) -> object:
+        """
+        Get the instance via proxy.
+
+        :return: the initialized or cached instance
+        """
+        return self.__owner.get_instance(self, self.__args, self.__kwargs)
+
+    def __getattr__(self, name: str) -> Union[LazyInstanceMethod, object]:
+        """
+        Get the value of the *name* member of the instance.
+
+        :param name: The name of the member
+        :return: the value of the member
+
+        If the value of *name* is callable, wrap it inside
+        `LazyInstanceMethod`.
+        """
+        if self.__owner.has_method(name):
+            return LazyInstanceMethod(self, name)
+        inst: object = self.get_instance()
+        return cast(object, getattr(inst, name))
+
+
+class LazyInstance:
+    r"""
+    Support lazy initialization.
+
+    Object is constructed/initialized at time when its member function is
+    called. Example::
+
+        foo_factory = LazyInstance(Foo, initialize_once=False)
+        foo = foo_factory.create(1, bar=2)
+        test(foo.quux)
+
+    when ``test`` calls ``foo.quux``, ``Foo(1, bar=2)`` is invoked first
+    to make the instance of ``Foo`` and to cache the instance inside
+    ``foo_factory``. Then, from this instance, ``quux`` is invoked. Since
+    ``foo_factory`` was created with *initialize_once* property set to `False`,
+    ``foo`` is initialized every time when ``foo.quux`` is invoked.
+
+    The story behind `LazyInstance`: consider the following snippet of code::
+
+        class Foo:
+            def __init__(self):
+                self.stream = sys.stderr
+
+            def greet(self):
+                self.stream.write("Hello!\n")
+
+
+        def test(func, mystream):
+            # Replace sys.stderr for mystream:
+            with SysStderrPatcher(mystream).patch():
+                func()
+
+    in this scenario::
+
+        mystream = io.StringIO()
+        foo = Foo()
+        test(foo.greet, mystream)
+
+    ``Hello!\n`` will be send to `sys.stderr` since the patching has been done
+    too late. This is where `LazyInstance` comes to help us::
+
+        mystream = io.StringIO()
+        foo_factory = LazyInstance(Foo)
+        foo = foo_factory.create()
+        test(foo.greet, mystream)
+
+    now,  ``Hello!\n`` is written to ``mystream`` as expected.
+    """
+
+    __slots__ = ("__cache", "__klass", "__initialize_once")
+
+    def __init__(
+        self, klass: "_FuncType", initialize_once: bool = False
+    ) -> None:
+        """
+        Initialize the lazy instance.
+
+        :param klass: The class from which instance is created
+        :param initialize_once: The flag saying that instance should be created
+            and initialized only once
+        """
+        self.__cache: Dict["LazyInstanceProxy", object] = {}
+        self.__klass: "_FuncType" = klass
+        self.__initialize_once: bool = initialize_once
+
+    def get_instance(
+        self,
+        proxy: "LazyInstanceProxy",
+        args: Tuple[object, ...],
+        kwargs: Dict[str, object],
+    ) -> object:
+        """
+        Get the instance.
+
+        :param proxy: The lazy instance proxy
+        :param args: Arguments passed to the constructor during the
+            initialization of the instance
+        :param kwargs: Key-value arguments passed to the constructor during the
+            initialization of the instance
+        :return: the initialized or cached instance
+
+        If the instance is not created or initialized or if it is to be needed
+        reinitialized, do it. *args* and *kwargs* are passed to the
+        constructor.
+        """
+        if proxy not in self.__cache or not self.__initialize_once:
+            self.__cache[proxy] = self.__klass(*args, **kwargs)
+        return self.__cache[proxy]
+
+    def has_method(self, name: str) -> bool:
+        """
+        Test whether the class has method *name*.
+
+        :param name: The name of the method
+        :return: `True` if the class has the method called *name*
+        """
+        return callable(cast(object, getattr(self.__klass, name, None)))
+
+    def create(self, *args: object, **kwargs: object) -> "LazyInstanceProxy":
+        """
+        Create the proxy of the lazy instance.
+
+        :param args: Arguments passed to the constructor during the
+            initialization of the instance
+        :param kwargs: Key-value arguments passed to the constructor during the
+            initialization of the instance
+        :return: the proxy of the lazy instance
+        """
+        return LazyInstanceProxy(self, args, kwargs)
 
 
 class AssertRaises:

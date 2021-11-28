@@ -126,6 +126,38 @@ from foopkg.foo import func_a
 cover_typing("foopkg.foo", ["_A", "_B", "_C"])
 ```
 
+### Deferred Instance Initialization
+
+Patching may take no effect if the patched object appears in constructor and
+this constructor is called outside of patcher context. `LazyInstance` from
+`vutils.testing.utils` can defer initialization up to the time of method call:
+```python
+class StderrWriter:
+    def __init__(self):
+        self.stream = sys.stderr
+
+    def write(self, text):
+        self.stream.write(text)
+
+class StderrPatcher(PatcherFactory):
+    def setup(self):
+        self.stream = io.StringIO
+        self.add_spec("sys.stderr", new=self.stream)
+
+class MyTestCase(TestCase):
+    def test_deferred_initialization(self):
+        writerA = StderrWriter()
+        writerB = LazyInstance(StderrWriter).create()
+        patcher = StderrPatcher()
+
+        # Patch sys.stderr:
+        with patcher.patch():
+            # Write Hello! to standard error output:
+            writerA.write("Hello!\n")
+            # Write Hi! to StringIO instance:
+            writerB.write("Hi!\n")
+```
+
 ### Deferred `assertRaises`
 
 Sometimes there are callable objects with a very similar prototypes and
