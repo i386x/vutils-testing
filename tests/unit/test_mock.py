@@ -144,6 +144,21 @@ class PatchSpecTestCase(PatchXTestCaseBase):
         self.assert_called_with(setupfunc, new)
         self.assert_called_with(self.patch, self.target, new, create=True)
 
+    def test_patch_spec_for_side_effects(self):
+        """Test `PatchSpec` for side effects."""
+        new = 1
+        patchspec = PatchSpec(self.target, None, new=new)
+
+        with self.patcher.patch():
+            patchspec()
+
+        self.assert_called_with(self.patch, self.target, new)
+
+        with self.patcher.patch():
+            patchspec()
+
+        self.assert_called_with(self.patch, self.target, new)
+
 
 class PatchingContextManagerTestCase(TestCase):
     """Test case for `PatchingContextManager`."""

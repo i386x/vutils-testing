@@ -81,10 +81,11 @@ class PatchSpec:
            *target*, the mock object, and additional arguments given by
            *kwargs*, respectively
         """
-        mock: Union["Mock", object] = self.__kwargs.pop("new", make_mock())
+        kwargs: Dict[str, object] = self.__kwargs.copy()
+        mock: Union["Mock", object] = kwargs.pop("new", make_mock())
         if self.__setupfunc is not None:
             self.__setupfunc(mock)
-        return _make_patch(self.__target, mock, **self.__kwargs)
+        return _make_patch(self.__target, mock, **kwargs)
 
 
 class PatchingContextManager:
