@@ -9,12 +9,19 @@
 """Mocking utilities."""
 
 import unittest.mock
-from typing import TYPE_CHECKING, Dict, Iterable, List, Union
+from typing import TYPE_CHECKING, Iterable, List
 
 if TYPE_CHECKING:
-    from unittest.mock import Mock, _patch
+    from unittest.mock import Mock
 
-    from vutils.testing import _make_patch, _ReturnsType, _SetupFuncType
+    from vutils.testing import (
+        _KwArgsType,
+        _make_patch,
+        _MockableType,
+        _PatchType,
+        _ReturnsType,
+        _SetupFuncType,
+    )
 else:
     _make_patch = unittest.mock.patch
 
@@ -63,9 +70,9 @@ class PatchSpec:
         """
         self.__target: object = target
         self.__setupfunc: "_SetupFuncType" = setupfunc
-        self.__kwargs: Dict[str, object] = kwargs
+        self.__kwargs: "_KwArgsType" = kwargs
 
-    def __call__(self) -> "_patch[Union[Mock, object]]":
+    def __call__(self) -> "_PatchType":
         """
         Create the patcher from the specification.
 
@@ -81,8 +88,8 @@ class PatchSpec:
            *target*, the mock object, and additional arguments given by
            *kwargs*, respectively
         """
-        kwargs: Dict[str, object] = self.__kwargs.copy()
-        mock: Union["Mock", object] = kwargs.pop("new", make_mock())
+        kwargs: "_KwArgsType" = self.__kwargs.copy()
+        mock: "_MockableType" = kwargs.pop("new", make_mock())
         if self.__setupfunc is not None:
             self.__setupfunc(mock)
         return _make_patch(self.__target, mock, **kwargs)
@@ -93,15 +100,13 @@ class PatchingContextManager:
 
     __slots__ = ("__patchers",)
 
-    def __init__(
-        self, patchers: Iterable["_patch[Union[Mock, object]]"]
-    ) -> None:
+    def __init__(self, patchers: Iterable["_PatchType"]) -> None:
         """
         Initialize the context manager.
 
         :param patchers: The list of patchers
         """
-        self.__patchers: List["_patch[Union[Mock, object]]"] = list(patchers)
+        self.__patchers: List["_PatchType"] = list(patchers)
 
     def __enter__(self) -> "PatchingContextManager":
         """

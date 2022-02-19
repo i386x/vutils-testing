@@ -6,20 +6,30 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Type hints for `vutils.testing`."""
 
-from typing import Callable, Dict, Optional, Tuple, Type, Union
+from typing import Callable
 from unittest.mock import Mock, _patch
 
-_ReturnsType = Optional[Union[object, Callable[[object], object]]]
-_SetupFuncType = Optional[Callable[[Union[Mock, object]], None]]
-_BasesType = Optional[Union[type, Tuple[type, ...]]]
-_MembersType = Optional[Dict[str, object]]
-_ExcSpecType = Union[Type[Exception], Tuple[Type[Exception], ...]]
+from typing_extensions import TypeAlias
+
+_ArgsType: TypeAlias = tuple[object, ...]
+_KwArgsType: TypeAlias = dict[str, object]
+_ExcType: TypeAlias = type[Exception]
+_MockableType: TypeAlias = Mock | object
+
+_ReturnsType: TypeAlias = object | Callable[[object], object] | None
+_SetupFuncType: TypeAlias = Callable[[_MockableType], None] | None
+_BasesType: TypeAlias = type | tuple[type, ...] | None
+_MembersType: TypeAlias = _KwArgsType | None
+_ExcSpecType: TypeAlias = _ExcType | tuple[_ExcType, ...]
+_PatchType: TypeAlias = _patch[_MockableType]
+
+class _TypeType:
+    def __call__(self, *args: object, **kwargs: object) -> object: ...
 
 class _FuncType:
     def __call__(self, *args: object, **kwargs: object) -> object: ...
 
 def _make_patch(
-    target: object, mock: Union[Mock, object], **kwargs: object
-) -> _patch[Union[Mock, object]]: ...
+    target: object, mock: _MockableType, **kwargs: object
+) -> _PatchType: ...
