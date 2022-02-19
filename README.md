@@ -35,7 +35,7 @@ my_error = make_type("MyError", Exception)
 my_class = make_type("MyClass", (A, B))
 
 # Create class derived from A with foo member:
-my_another_class = make_type("MyOtherClass", A, {"foo": 42})
+my_another_class = make_type("MyAnotherClass", A, {"foo": 42})
 
 # Create class derived from object with foo member:
 my_test_class = make_type("MyTestClass", members={"foo": 42})
