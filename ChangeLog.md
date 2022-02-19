@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.5.2
+
+* Fixed typo in class name in `README.md`
+* Switch to Python 3.10+ typing notation
+* Drop Python 3.6, add Python 3.10
+
 ## 0.5.1
 
 * Fixed key-value arguments loss when `PatchSpec` instance is called more than
