@@ -14,11 +14,17 @@ import sys
 from vutils.testing.mock import PatcherFactory
 
 SYMBOLS = (
+    "_ArgsType",
+    "_KwArgsType",
+    "_ExcType",
+    "_MockableType",
     "_ReturnsType",
     "_SetupFuncType",
     "_BasesType",
     "_MembersType",
     "_ExcSpecType",
+    "_PatchType",
+    "_TypeType",
     "_FuncType",
     "_make_patch",
 )

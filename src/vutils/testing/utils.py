@@ -9,7 +9,7 @@
 """Miscellaneous utilities."""
 
 import importlib
-from typing import TYPE_CHECKING, Dict, Iterable, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Iterable, cast
 
 from vutils.testing.mock import PatcherFactory
 
@@ -17,10 +17,13 @@ if TYPE_CHECKING:
     from unittest import TestCase
 
     from vutils.testing import (
+        _ArgsType,
         _BasesType,
         _ExcSpecType,
         _FuncType,
+        _KwArgsType,
         _MembersType,
+        _TypeType,
     )
 
 
@@ -109,8 +112,8 @@ class LazyInstanceProxy:
     def __init__(
         self,
         owner: "LazyInstance",
-        args: Tuple[object, ...],
-        kwargs: Dict[str, object],
+        args: "_ArgsType",
+        kwargs: "_KwArgsType",
     ) -> None:
         """
         Initialize the proxy.
@@ -122,8 +125,8 @@ class LazyInstanceProxy:
             during the initialization of the instance
         """
         self.__owner: "LazyInstance" = owner
-        self.__args: Tuple[object, ...] = args
-        self.__kwargs: Dict[str, object] = kwargs
+        self.__args: "_ArgsType" = args
+        self.__kwargs: "_KwArgsType" = kwargs
 
     def get_instance(self) -> object:
         """
@@ -133,7 +136,7 @@ class LazyInstanceProxy:
         """
         return self.__owner.get_instance(self, self.__args, self.__kwargs)
 
-    def __getattr__(self, name: str) -> Union[LazyInstanceMethod, object]:
+    def __getattr__(self, name: str) -> "LazyInstanceMethod | object":
         """
         Get the value of the *name* member of the instance.
 
@@ -201,7 +204,7 @@ class LazyInstance:
     __slots__ = ("__cache", "__klass", "__initialize_once")
 
     def __init__(
-        self, klass: "_FuncType", initialize_once: bool = False
+        self, klass: "_TypeType", initialize_once: bool = False
     ) -> None:
         """
         Initialize the lazy instance.
@@ -210,15 +213,15 @@ class LazyInstance:
         :param initialize_once: The flag saying that instance should be created
             and initialized only once
         """
-        self.__cache: Dict["LazyInstanceProxy", object] = {}
-        self.__klass: "_FuncType" = klass
+        self.__cache: "dict[LazyInstanceProxy, object]" = {}
+        self.__klass: "_TypeType" = klass
         self.__initialize_once: bool = initialize_once
 
     def get_instance(
         self,
         proxy: "LazyInstanceProxy",
-        args: Tuple[object, ...],
-        kwargs: Dict[str, object],
+        args: "_ArgsType",
+        kwargs: "_KwArgsType",
     ) -> object:
         """
         Get the instance.
@@ -301,9 +304,9 @@ class AssertRaises:
         if not isinstance(raises, tuple):
             raises = (raises,)
         self.__raises: "_ExcSpecType" = raises
-        self.__exception: Optional[Exception] = None
+        self.__exception: "Exception | None" = None
 
-    def get_exception(self) -> Optional[Exception]:
+    def get_exception(self) -> "Exception | None":
         """
         Get the caught exception.
 
@@ -311,7 +314,7 @@ class AssertRaises:
 
         When called, *self* is cleared (the next call will return `None`).
         """
-        exc: Optional[Exception] = self.__exception
+        exc: "Exception | None" = self.__exception
         self.__exception = None
         return exc
 

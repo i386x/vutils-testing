@@ -99,7 +99,7 @@ class PatchXTestCaseBase(TestCase):
     __slots__ = ("mock", "patch", "patcher", "target")
 
     def setUp(self):
-        """Set up the test case."""
+        """Set up the test."""
         self.mock = make_mock()
         mock_mock = make_callable(lambda *x: self.mock)
         self.patch = make_callable(lambda *x, **y: make_mock())
