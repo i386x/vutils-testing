@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-from typing import Callable
+from collections.abc import Callable
 from unittest.mock import Mock, _patch
 
 from typing_extensions import TypeAlias
