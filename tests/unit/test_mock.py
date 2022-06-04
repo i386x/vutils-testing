@@ -18,11 +18,7 @@ from vutils.testing.mock import (
     make_mock,
 )
 from vutils.testing.testcase import TestCase
-from vutils.testing.utils import cover_typing, make_type
-
-from .common import SYMBOLS
-
-cover_typing("vutils.testing.mock", SYMBOLS)
+from vutils.testing.utils import make_type
 
 
 class MakeMockTestCase(TestCase):

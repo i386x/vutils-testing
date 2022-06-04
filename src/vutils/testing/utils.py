@@ -370,7 +370,18 @@ def cover_typing(name: str, symbols: Iterable[str]) -> None:
 
         cover_typing("foo.bar", ["_TypeA", "_TypeB"])
 
-    in the test code after imports.
+    Since this function uses `importlib.reload`, unpleasant side-effects may
+    occur. To avoid this, put your `cover_typing` code into separate file and
+    tell to ``pytest`` to run it as last (use ``pytest-order`` plugin) ::
+
+        import pytest
+
+        from vutils.testing.utils import cover_typing
+
+
+        @pytest.mark.order("last")
+        def test_typing_code_is_covered():
+            cover_typing("foo.bar", ["_TypeA", "_TypeB"])
     """
     module = importlib.import_module(name)
     patcher = TypingPatcher()

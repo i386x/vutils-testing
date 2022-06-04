@@ -115,16 +115,24 @@ therefore improve coverage reports:
 if typing.TYPE_CHECKING:
     from foopkg import _A, _B, _C
 
-# In test_foo.py:
-from foopkg.foo import func_a
+# In test_coverage.py:
+import pytest
 
-# Use after imports so module cache is populated with proper modules. When
-# called, following happens:
-# - typing.TYPE_CHECKING is patched to True
-# - foopkg is patched with _A, _B, and _C symbols if they do not exist
-# - finally, foopkg.foo is reloaded
-cover_typing("foopkg.foo", ["_A", "_B", "_C"])
+from vutils.testing.utils import cover_typing
+
+# Ensure the test run as last (this feature is available after installing
+# pytest-order). cover_typing reloads the module which may have negative
+# consequences on other tests
+@pytest.mark.order("last")
+def test_typing_code_is_covered():
+    # When called, following happens:
+    # - typing.TYPE_CHECKING is patched to True
+    # - foopkg is patched with _A, _B, and _C symbols if they do not exist
+    # - finally, foopkg.foo is reloaded
+    cover_typing("foopkg.foo", ["_A", "_B", "_C"])
 ```
+The story behind `cover_typing` is to keep source files clean from directives
+telling the `pytest` and linters what to do.
 
 ### Deferred Instance Initialization
 
