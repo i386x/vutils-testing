@@ -12,24 +12,16 @@ import sys
 
 from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
-from vutils.testing.utils import (
-    AssertRaises,
-    LazyInstance,
-    cover_typing,
-    make_type,
-)
+from vutils.testing.utils import AssertRaises, LazyInstance, make_type
 
 from .common import (
     FOO_CONSTANT,
-    SYMBOLS,
     FooError,
     StderrPatcher,
     StderrWriter,
     func_a,
     func_b,
 )
-
-cover_typing("vutils.testing.utils", SYMBOLS)
 
 
 class MakeTypeTestCase(TestCase):
