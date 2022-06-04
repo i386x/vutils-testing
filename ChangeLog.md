@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.5.3
+
+* Fix PEP 585 issue
+* Remove deprecated `pylint` warnings from `pyproject.toml`
+* Run tests with `cover_typing` as last
+
 ## 0.5.2
 
 * Fixed typo in class name in `README.md`
