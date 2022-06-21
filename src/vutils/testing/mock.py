@@ -1,4 +1,4 @@
-#                                                         -*- coding: utf-8 -*-
+#
 # File:    ./src/vutils/testing/mock.py
 # Author:  Jiří Kučera <sanczes AT gmail.com>
 # Date:    2021-09-13 17:04:14 +0200

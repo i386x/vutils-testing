@@ -1,4 +1,4 @@
-#                                                         -*- coding: utf-8 -*-
+#
 # File:    ./src/vutils/testing/utils.py
 # Author:  Jiří Kučera <sanczes AT gmail.com>
 # Date:    2021-09-14 17:12:48 +0200

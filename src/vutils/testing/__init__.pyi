@@ -1,4 +1,4 @@
-#                                                         -*- coding: utf-8 -*-
+#
 # File:    ./src/vutils/testing/__init__.pyi
 # Author:  Jiří Kučera <sanczes AT gmail.com>
 # Date:    2021-09-17 14:14:50 +0200
