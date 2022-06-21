@@ -1,4 +1,4 @@
-#                                                         -*- coding: utf-8 -*-
+#
 # File:    ./tests/unit/test_mock.py
 # Author:  Jiří Kučera <sanczes AT gmail.com>
 # Date:    2021-09-16 22:48:07 +0200

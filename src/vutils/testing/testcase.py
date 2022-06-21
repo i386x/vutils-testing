@@ -1,4 +1,4 @@
-#                                                         -*- coding: utf-8 -*-
+#
 # File:    ./src/vutils/testing/testcase.py
 # Author:  Jiří Kučera <sanczes AT gmail.com>
 # Date:    2021-09-02 00:59:53 +0200
