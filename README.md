@@ -134,6 +134,30 @@ def test_typing_code_is_covered():
 The story behind `cover_typing` is to keep source files clean from directives
 telling the `pytest` and linters what to do.
 
+Sometimes a symbol can play two roles. Suppose that symbol `_L` is a type alias
+for `list[object]` when `mypy` is performing its checks and `list` otherwise:
+```python
+# In foopkg/foo.py module:
+if typing.TYPE_CHECKING:
+    from foopkg import _L
+else:
+    _L = list
+
+
+class ListType(_L):
+    pass
+```
+To cover this case, `ClassLikeSymbol` from `vutils.testing.utils` comes to
+help. In `test_coverage.py`, just define `_L` like
+```python
+class _L(metaclass=ClassLikeSymbol):
+    pass
+```
+and then pass it to `cover_typing`:
+```python
+cover_typing("foopkg.foo", [_L])
+```
+
 ### Deferred Instance Initialization
 
 Patching may take no effect if the patched object appears in constructor and
