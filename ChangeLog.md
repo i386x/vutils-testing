@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.6.0
+
+* New class `ClassLikeSymbol`
+
 ## 0.5.3
 
 * Fix PEP 585 issue
