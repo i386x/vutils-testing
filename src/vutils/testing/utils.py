@@ -354,6 +354,20 @@ class TypingPatcher(PatcherFactory):
             self.add_spec(f"{target}.{symbol}", new=symbol, create=True)
 
 
+class ClassLikeSymbol(type):
+    """Meta class for class-like symbols."""
+
+    __slots__ = ()
+
+    def __repr__(cls) -> str:
+        """
+        Return the class-like symbol name.
+
+        :return: the class-like symbol name
+        """
+        return cls.__name__
+
+
 def cover_typing(name: str, symbols: Iterable[str]) -> None:
     """
     Cover the ``if typing.TYPE_CHECKING`` branch.

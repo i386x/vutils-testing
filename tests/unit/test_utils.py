@@ -12,7 +12,12 @@ import sys
 
 from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
-from vutils.testing.utils import AssertRaises, LazyInstance, make_type
+from vutils.testing.utils import (
+    AssertRaises,
+    ClassLikeSymbol,
+    LazyInstance,
+    make_type,
+)
 
 from .common import (
     FOO_CONSTANT,
@@ -131,3 +136,17 @@ class AssertRaisesTestCase(TestCase):
         self.run_and_verify(wfunc_b)
         self.assertEqual(wfunc_b.get_exception().detail, FOO_CONSTANT)
         self.assertIsNone(wfunc_b.get_exception())
+
+
+class ClassLikeSymbolTestCase(TestCase):
+    """Test case for `ClassLikeSymbol`."""
+
+    __slots__ = ()
+
+    def test_repr_returns_class_name(self):
+        """Test whether `repr` returns a class name."""
+
+        class DummySymbol(metaclass=ClassLikeSymbol):
+            """Dummy symbol."""
+
+        self.assertEqual(f"{DummySymbol}", DummySymbol.__name__)
