@@ -17,20 +17,20 @@ if TYPE_CHECKING:
     from unittest import TestCase
 
     from vutils.testing import (
-        _ArgsType,
-        _BasesType,
-        _ExcSpecType,
-        _FuncType,
-        _KwArgsType,
-        _MembersType,
-        _TypeType,
+        ArgsType,
+        BasesType,
+        ExcSpecType,
+        FuncType,
+        KwArgsType,
+        MembersType,
+        TypeType,
     )
 
 
 def make_type(
     name: str,
-    bases: "_BasesType" = None,
-    members: "_MembersType" = None,
+    bases: "BasesType" = None,
+    members: "MembersType" = None,
     **kwargs: object,
 ) -> type:
     """
@@ -101,7 +101,7 @@ class LazyInstanceMethod:
         :return: the value returned by the method
         """
         inst: object = self.__owner.get_instance()
-        return cast("_FuncType", getattr(inst, self.__name))(*args, **kwargs)
+        return cast("FuncType", getattr(inst, self.__name))(*args, **kwargs)
 
 
 class LazyInstanceProxy:
@@ -112,8 +112,8 @@ class LazyInstanceProxy:
     def __init__(
         self,
         owner: "LazyInstance",
-        args: "_ArgsType",
-        kwargs: "_KwArgsType",
+        args: "ArgsType",
+        kwargs: "KwArgsType",
     ) -> None:
         """
         Initialize the proxy.
@@ -125,8 +125,8 @@ class LazyInstanceProxy:
             during the initialization of the instance
         """
         self.__owner: "LazyInstance" = owner
-        self.__args: "_ArgsType" = args
-        self.__kwargs: "_KwArgsType" = kwargs
+        self.__args: "ArgsType" = args
+        self.__kwargs: "KwArgsType" = kwargs
 
     def get_instance(self) -> object:
         """
@@ -204,7 +204,7 @@ class LazyInstance:
     __slots__ = ("__cache", "__klass", "__initialize_once")
 
     def __init__(
-        self, klass: "_TypeType", initialize_once: bool = False
+        self, klass: "TypeType", initialize_once: bool = False
     ) -> None:
         """
         Initialize the lazy instance.
@@ -214,14 +214,14 @@ class LazyInstance:
             and initialized only once
         """
         self.__cache: "dict[LazyInstanceProxy, object]" = {}
-        self.__klass: "_TypeType" = klass
+        self.__klass: "TypeType" = klass
         self.__initialize_once: bool = initialize_once
 
     def get_instance(
         self,
         proxy: "LazyInstanceProxy",
-        args: "_ArgsType",
-        kwargs: "_KwArgsType",
+        args: "ArgsType",
+        kwargs: "KwArgsType",
     ) -> object:
         """
         Get the instance.
@@ -290,7 +290,7 @@ class AssertRaises:
     __slots__ = ("__testcase", "__func", "__raises", "__exception")
 
     def __init__(
-        self, testcase: "TestCase", func: "_FuncType", raises: "_ExcSpecType"
+        self, testcase: "TestCase", func: "FuncType", raises: "ExcSpecType"
     ) -> None:
         """
         Initialize the wrapper.
@@ -300,10 +300,10 @@ class AssertRaises:
         :param raises: The expected exceptions
         """
         self.__testcase: "TestCase" = testcase
-        self.__func: "_FuncType" = func
+        self.__func: "FuncType" = func
         if not isinstance(raises, tuple):
             raises = (raises,)
-        self.__raises: "_ExcSpecType" = raises
+        self.__raises: "ExcSpecType" = raises
         self.__exception: "Exception | None" = None
 
     def get_exception(self) -> "Exception | None":
