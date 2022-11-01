@@ -9,21 +9,21 @@
 """Mocking utilities."""
 
 import unittest.mock
-from typing import TYPE_CHECKING, Iterable, List
+from typing import TYPE_CHECKING, Iterable
 
 if TYPE_CHECKING:
     from unittest.mock import Mock
 
     from vutils.testing import (
-        _KwArgsType,
-        _make_patch,
-        _MockableType,
-        _PatchType,
-        _ReturnsType,
-        _SetupFuncType,
+        KwArgsType,
+        MockableType,
+        PatchType,
+        ReturnsType,
+        SetupFuncType,
+        make_patch,
     )
 else:
-    _make_patch = unittest.mock.patch
+    make_patch = unittest.mock.patch
 
 
 def make_mock(*args: object, **kwargs: object) -> "Mock":
@@ -39,7 +39,7 @@ def make_mock(*args: object, **kwargs: object) -> "Mock":
     return unittest.mock.Mock(*args, **kwargs)
 
 
-def make_callable(returns: "_ReturnsType" = None) -> "Mock":
+def make_callable(returns: "ReturnsType" = None) -> "Mock":
     """
     Make the `unittest.mock.Mock` object that serves as a callable.
 
@@ -59,7 +59,7 @@ class PatchSpec:
     __slots__ = ("__target", "__setupfunc", "__kwargs")
 
     def __init__(
-        self, target: object, setupfunc: "_SetupFuncType", **kwargs: object
+        self, target: object, setupfunc: "SetupFuncType", **kwargs: object
     ) -> None:
         """
         Initialize the patch specification.
@@ -69,10 +69,10 @@ class PatchSpec:
         :param kwargs: Additional arguments passed to `unittest.mock.patch`
         """
         self.__target: object = target
-        self.__setupfunc: "_SetupFuncType" = setupfunc
-        self.__kwargs: "_KwArgsType" = kwargs
+        self.__setupfunc: "SetupFuncType" = setupfunc
+        self.__kwargs: "KwArgsType" = kwargs
 
-    def __call__(self) -> "_PatchType":
+    def __call__(self) -> "PatchType":
         """
         Create the patcher from the specification.
 
@@ -88,11 +88,11 @@ class PatchSpec:
            *target*, the mock object, and additional arguments given by
            *kwargs*, respectively
         """
-        kwargs: "_KwArgsType" = self.__kwargs.copy()
-        mock: "_MockableType" = kwargs.pop("new", make_mock())
+        kwargs: "KwArgsType" = self.__kwargs.copy()
+        mock: "MockableType" = kwargs.pop("new", make_mock())
         if self.__setupfunc is not None:
             self.__setupfunc(mock)
-        return _make_patch(self.__target, mock, **kwargs)
+        return make_patch(self.__target, mock, **kwargs)
 
 
 class PatchingContextManager:
@@ -100,13 +100,13 @@ class PatchingContextManager:
 
     __slots__ = ("__patchers",)
 
-    def __init__(self, patchers: Iterable["_PatchType"]) -> None:
+    def __init__(self, patchers: Iterable["PatchType"]) -> None:
         """
         Initialize the context manager.
 
         :param patchers: The list of patchers
         """
-        self.__patchers: List["_PatchType"] = list(patchers)
+        self.__patchers: "list[PatchType]" = list(patchers)
 
     def __enter__(self) -> "PatchingContextManager":
         """
@@ -183,13 +183,13 @@ class PatcherFactory:
 
     def __init__(self) -> None:
         """Initialize the factory."""
-        self.__specs: List[PatchSpec] = []
+        self.__specs: "list[PatchSpec]" = []
         self.setup()
 
     def add_spec(
         self,
         target: object,
-        setupfunc: "_SetupFuncType" = None,
+        setupfunc: "SetupFuncType" = None,
         **kwargs: object,
     ) -> "PatcherFactory":
         """

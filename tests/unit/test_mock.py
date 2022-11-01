@@ -101,7 +101,7 @@ class PatchXTestCaseBase(TestCase):
         self.patch = make_callable(lambda *x, **y: make_mock())
         self.patcher = (
             PatcherFactory()
-            .add_spec("vutils.testing.mock._make_patch", new=self.patch)
+            .add_spec("vutils.testing.mock.make_patch", new=self.patch)
             .add_spec("unittest.mock.Mock", new=mock_mock)
         )
         self.target = "__main__.print"

@@ -12,24 +12,24 @@ from unittest.mock import Mock, _patch
 
 from typing_extensions import TypeAlias
 
-_ArgsType: TypeAlias = tuple[object, ...]
-_KwArgsType: TypeAlias = dict[str, object]
-_ExcType: TypeAlias = type[Exception]
-_MockableType: TypeAlias = Mock | object
+ArgsType: TypeAlias = tuple[object, ...]
+KwArgsType: TypeAlias = dict[str, object]
+ExcType: TypeAlias = type[Exception]
+MockableType: TypeAlias = Mock | object
 
-_ReturnsType: TypeAlias = object | Callable[[object], object] | None
-_SetupFuncType: TypeAlias = Callable[[_MockableType], None] | None
-_BasesType: TypeAlias = type | tuple[type, ...] | None
-_MembersType: TypeAlias = _KwArgsType | None
-_ExcSpecType: TypeAlias = _ExcType | tuple[_ExcType, ...]
-_PatchType: TypeAlias = _patch[_MockableType]
+ReturnsType: TypeAlias = object | Callable[[object], object] | None
+SetupFuncType: TypeAlias = Callable[[MockableType], None] | None
+BasesType: TypeAlias = type | tuple[type, ...] | None
+MembersType: TypeAlias = KwArgsType | None
+ExcSpecType: TypeAlias = ExcType | tuple[ExcType, ...]
+PatchType: TypeAlias = _patch[MockableType]
 
-class _TypeType:
+class TypeType:
     def __call__(self, *args: object, **kwargs: object) -> object: ...
 
-class _FuncType:
+class FuncType:
     def __call__(self, *args: object, **kwargs: object) -> object: ...
 
-def _make_patch(
-    target: object, mock: _MockableType, **kwargs: object
-) -> _PatchType: ...
+def make_patch(
+    target: object, mock: MockableType, **kwargs: object
+) -> PatchType: ...
