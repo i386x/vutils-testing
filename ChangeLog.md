@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.6.2
+
+* Fix `safety` issues
+
 ## 0.6.1
 
 * Fix `flake8` issues
