@@ -29,7 +29,7 @@ from vutils.testing.utils import (
     make_type,
 )
 
-from .common import (
+from .utils import (
     FOO_CONSTANT,
     CoverTypingPatcher,
     FooError,
