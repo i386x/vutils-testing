@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.1
+
+* Remove unused `pytest-order` from `tox.ini`
+
 ## 1.0.0
 
 * Move the development status to production/stable
