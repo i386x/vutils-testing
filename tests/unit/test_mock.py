@@ -6,7 +6,20 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Test `vutils.testing.mock` module."""
+"""
+Test :mod:`vutils.testing.mock` module.
+
+.. |make_mock| replace:: :func:`~vutils.testing.mock.make_mock`
+.. |make_callable| replace:: :func:`~vutils.testing.mock.make_callable`
+.. |PatchSpecTestCase| replace:: :class:`.PatchSpecTestCase`
+.. |PatcherFactoryTestCase| replace:: :class:`.PatcherFactoryTestCase`
+.. |PatchSpec| replace:: :class:`~vutils.testing.mock.PatchSpec`
+.. |setupfunc| replace::
+   :arg:`setupfunc:vutils.testing.mock.PatchSpec.__init__`
+.. |PatchingContextManager| replace::
+   :class:`~vutils.testing.mock.PatchingContextManager`
+.. |PatcherFactory| replace:: :class:`~vutils.testing.mock.PatcherFactory`
+"""
 
 import unittest.mock
 
@@ -22,23 +35,24 @@ from vutils.testing.utils import make_type
 
 
 class MakeMockTestCase(TestCase):
-    """Test case for `make_mock`."""
+    """Test case for |make_mock|."""
 
     __slots__ = ()
 
     def test_make_mock(self):
         """
-        Test `make_mock`.
+        Test |make_mock|.
 
-        Test whether `make_mock` returns the instance of `unittest.mock.Mock`.
+        Test whether |make_mock| returns the instance of
+        :class:`unittest.mock.Mock`.
         """
         self.assertIsInstance(make_mock(), unittest.mock.Mock)
 
     def test_make_mock_with_args(self):
         """
-        Test `make_mock` with arguments.
+        Test |make_mock| with arguments.
 
-        Test whether arguments are passed to `unittest.mock.Mock`.
+        Test whether arguments are passed to :class:`unittest.mock.Mock`.
         """
         text = "abc"
         mock = make_mock(["write"])
@@ -51,16 +65,16 @@ class MakeMockTestCase(TestCase):
 
 
 class MakeCallableTestCase(TestCase):
-    """Test case for `make_callable`."""
+    """Test case for |make_callable|."""
 
     __slots__ = ()
 
     def test_make_callable_with_no_args(self):
         """
-        Test `make_callable` with no arguments.
+        Test |make_callable| with no arguments.
 
-        With no arguments, `make_callable` will produce callable
-        `unittest.mock.Mock` object returning `None`.
+        With no arguments, |make_callable| will produce callable
+        :class:`unittest.mock.Mock` object returning :obj:`None`.
         """
         func = make_callable()
 
@@ -68,9 +82,9 @@ class MakeCallableTestCase(TestCase):
 
     def test_make_callable_with_non_callable(self):
         """
-        Test `make_callable` with non-callable.
+        Test |make_callable| with non-callable.
 
-        This will produce `unittest.mock.Mock` object that returns the
+        This will produce :class:`unittest.mock.Mock` object that returns the
         non-callable object as its value.
         """
         func = make_callable(3)
@@ -79,10 +93,10 @@ class MakeCallableTestCase(TestCase):
 
     def test_make_callable_with_callable(self):
         """
-        Test `make_callable` with callable.
+        Test |make_callable| with callable.
 
-        This will produce `unittest.mock.Mock` object that uses callable to
-        perform the side-effect.
+        This will produce :class:`unittest.mock.Mock` object that uses callable
+        to perform the side-effect.
         """
         func = make_callable(lambda x: x + 1)
 
@@ -90,7 +104,14 @@ class MakeCallableTestCase(TestCase):
 
 
 class PatchXTestCaseBase(TestCase):
-    """Base class for `PatchSpecTestCase` and `PatcherFactoryTestCase`."""
+    """
+    Base class for |PatchSpecTestCase| and |PatcherFactoryTestCase|.
+
+    :ivar mock: The :class:`unittest.mock.Mock` object used as an argument
+    :ivar patch: The mocked :func:`unittest.mock.patch`
+    :ivar patcher: The patcher
+    :ivar target: The target to be patched
+    """
 
     __slots__ = ("mock", "patch", "patcher", "target")
 
@@ -108,19 +129,19 @@ class PatchXTestCaseBase(TestCase):
 
 
 class PatchSpecTestCase(PatchXTestCaseBase):
-    """Test case for `PatchSpec`."""
+    """Test case for |PatchSpec|."""
 
     __slots__ = ()
 
     def test_patch_spec_without_setupfunc(self):
-        """Test `PatchSpec` with *setupfunc* set to `None`."""
+        """Test |PatchSpec| with |setupfunc| set to :obj:`None`."""
         with self.patcher.patch():
             PatchSpec(self.target, None)()
 
         self.assert_called_with(self.patch, self.target, self.mock)
 
     def test_patch_spec_with_setupfunc(self):
-        """Test `PatchSpec` with *setupfunc* given."""
+        """Test |PatchSpec| with |setupfunc| given."""
         setupfunc = make_callable()
 
         with self.patcher.patch():
@@ -130,7 +151,7 @@ class PatchSpecTestCase(PatchXTestCaseBase):
         self.assert_called_with(self.patch, self.target, self.mock)
 
     def test_patch_spec_with_all_args(self):
-        """Test `PatchSpec` with all arguments given."""
+        """Test |PatchSpec| with all arguments given."""
         setupfunc = make_callable()
         new = 1
 
@@ -141,7 +162,7 @@ class PatchSpecTestCase(PatchXTestCaseBase):
         self.assert_called_with(self.patch, self.target, new, create=True)
 
     def test_patch_spec_for_side_effects(self):
-        """Test `PatchSpec` for side effects."""
+        """Test |PatchSpec| for side effects."""
         new = 1
         patchspec = PatchSpec(self.target, None, new=new)
 
@@ -157,12 +178,12 @@ class PatchSpecTestCase(PatchXTestCaseBase):
 
 
 class PatchingContextManagerTestCase(TestCase):
-    """Test case for `PatchingContextManager`."""
+    """Test case for |PatchingContextManager|."""
 
     __slots__ = ()
 
     def test_patching_context_manager(self):
-        """Test `PatchingContextManager`."""
+        """Test |PatchingContextManager|."""
         func = make_callable()
 
         mock_a = make_mock()
@@ -188,12 +209,12 @@ class PatchingContextManagerTestCase(TestCase):
 
 
 class PatcherFactoryTestCase(PatchXTestCaseBase):
-    """Test case for `PatcherFactory`."""
+    """Test case for |PatcherFactory|."""
 
     __slots__ = ()
 
     def test_patcher_factory(self):
-        """Test `PatcherFactory`."""
+        """Test |PatcherFactory|."""
         setupfunc_a = make_callable()
         setupfunc_b = make_callable()
         patcher_klass = make_type(

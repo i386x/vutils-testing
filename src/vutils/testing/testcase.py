@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Extended `unittest.TestCase`."""
+"""Extended :class:`unittest.TestCase`."""
 
 import unittest
 from typing import TYPE_CHECKING
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class TestCase(unittest.TestCase):
-    """Extended `unittest.TestCase`."""
+    """Extended :class:`unittest.TestCase`."""
 
     __slots__ = ()
 
@@ -28,7 +28,7 @@ class TestCase(unittest.TestCase):
         Check and reset the mock call.
 
         :param mock: The mock object
-        :param args: Expected arguments
+        :param args: Expected positional arguments
         :param kwargs: Expected key-value arguments
 
         Check whether the mock object has been called with given arguments and
@@ -40,7 +40,7 @@ class TestCase(unittest.TestCase):
     @staticmethod
     def assert_not_called(mock: "Mock") -> None:
         """
-        Check that *mock* has not been called.
+        Check that :arg:`mock` has not been called.
 
         :param mock: The mock object
 

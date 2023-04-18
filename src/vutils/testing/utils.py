@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Iterable, cast
 from vutils.testing.mock import PatcherFactory
 
 if TYPE_CHECKING:
+    from types import ModuleType
     from unittest import TestCase
 
     from vutils.testing import (
@@ -39,7 +40,7 @@ def make_type(
     :param name: The type name
     :param bases: The type's bases
     :param members: The definition of type's members and methods
-    :param kwargs: Additional arguments passed to `type`
+    :param kwargs: Additional key-value arguments passed to :class:`type`
     :return: the new type
 
     This function becomes handy when creating types used as test data. For
@@ -78,8 +79,15 @@ def make_type(
 
 
 class LazyInstanceMethod:
-    """Lazy instance method."""
+    """
+    Lazy instance method.
 
+    :ivar __owner: The lazy instance proxy
+    :ivar __name: The method name
+    """
+
+    __owner: "LazyInstanceProxy"
+    __name: str
     __slots__ = ("__owner", "__name")
 
     def __init__(self, owner: "LazyInstanceProxy", name: str) -> None:
@@ -89,14 +97,14 @@ class LazyInstanceMethod:
         :param owner: The owner of the lazy instance method
         :param name: The name of the method
         """
-        self.__owner: "LazyInstanceProxy" = owner
-        self.__name: str = name
+        self.__owner = owner
+        self.__name = name
 
     def __call__(self, *args: object, **kwargs: object) -> object:
         """
         Delegate the call to the proper method of the instance.
 
-        :param args: Arguments passed to the method
+        :param args: Positional arguments passed to the method
         :param kwargs: Key-value arguments passed to the method
         :return: the value returned by the method
         """
@@ -105,8 +113,17 @@ class LazyInstanceMethod:
 
 
 class LazyInstanceProxy:
-    """Lazy instance proxy."""
+    """
+    Lazy instance proxy.
 
+    :ivar __owner: The lazy instance
+    :ivar __args: Positional arguments passed to the instance constructor
+    :ivar __kwargs: Key-value arguments passed to the instance constructor
+    """
+
+    __owner: "LazyInstance"
+    __args: "ArgsType"
+    __kwargs: "KwArgsType"
     __slots__ = ("__owner", "__args", "__kwargs")
 
     def __init__(
@@ -119,14 +136,14 @@ class LazyInstanceProxy:
         Initialize the proxy.
 
         :param owner: The owner of the proxy
-        :param args: Arguments to be passed to the constructor during the
-            initialization of the instance
+        :param args: Positional arguments to be passed to the constructor
+            during the initialization of the instance
         :param kwargs: Key-value arguments to be passed to the constructor
             during the initialization of the instance
         """
-        self.__owner: "LazyInstance" = owner
-        self.__args: "ArgsType" = args
-        self.__kwargs: "KwArgsType" = kwargs
+        self.__owner = owner
+        self.__args = args
+        self.__kwargs = kwargs
 
     def get_instance(self) -> object:
         """
@@ -138,13 +155,13 @@ class LazyInstanceProxy:
 
     def __getattr__(self, name: str) -> "LazyInstanceMethod | object":
         """
-        Get the value of the *name* member of the instance.
+        Get the value of the :arg:`name` member of the instance.
 
         :param name: The name of the member
         :return: the value of the member
 
-        If the value of *name* is callable, wrap it inside
-        `LazyInstanceMethod`.
+        If the value of :arg:`name` is callable, wrap it inside
+        :class:`.LazyInstanceMethod`.
         """
         if self.__owner.has_method(name):
             return LazyInstanceMethod(self, name)
@@ -156,6 +173,11 @@ class LazyInstance:
     r"""
     Support lazy initialization.
 
+    :ivar __cache: The lazy instance proxy to the instance mapping
+    :ivar __klass: The class of the instance
+    :ivar __initialize_once: When :obj:`False`, :meth:`.get_instance` creates
+        a new instance every time when called
+
     Object is constructed/initialized at time when its member function is
     called. Example::
 
@@ -166,10 +188,12 @@ class LazyInstance:
     when ``test`` calls ``foo.quux``, ``Foo(1, bar=2)`` is invoked first
     to make the instance of ``Foo`` and to cache the instance inside
     ``foo_factory``. Then, from this instance, ``quux`` is invoked. Since
-    ``foo_factory`` was created with *initialize_once* property set to `False`,
-    ``foo`` is initialized every time when ``foo.quux`` is invoked.
+    ``foo_factory`` was created with :attr:`.__initialize_once` property set
+    to :obj:`False`, ``foo`` is initialized every time when ``foo.quux`` is
+    invoked.
 
-    The story behind `LazyInstance`: consider the following snippet of code::
+    The story behind :class:`.LazyInstance`: consider the following snippet of
+    code::
 
         class Foo:
             def __init__(self):
@@ -190,17 +214,20 @@ class LazyInstance:
         foo = Foo()
         test(foo.greet, mystream)
 
-    ``Hello!\n`` will be send to `sys.stderr` since the patching has been done
-    too late. This is where `LazyInstance` comes to help us::
+    ``Hello!\n`` will be send to :obj:`sys.stderr` since the patching has been
+    done too late. This is where :class:`.LazyInstance` comes to help us::
 
         mystream = io.StringIO()
         foo_factory = LazyInstance(Foo)
         foo = foo_factory.create()
         test(foo.greet, mystream)
 
-    now,  ``Hello!\n`` is written to ``mystream`` as expected.
+    now, ``Hello!\n`` is written to ``mystream`` as expected.
     """
 
+    __cache: "dict[LazyInstanceProxy, object]"
+    __klass: "TypeType"
+    __initialize_once: bool
     __slots__ = ("__cache", "__klass", "__initialize_once")
 
     def __init__(
@@ -213,9 +240,9 @@ class LazyInstance:
         :param initialize_once: The flag saying that instance should be created
             and initialized only once
         """
-        self.__cache: "dict[LazyInstanceProxy, object]" = {}
-        self.__klass: "TypeType" = klass
-        self.__initialize_once: bool = initialize_once
+        self.__cache = {}
+        self.__klass = klass
+        self.__initialize_once = initialize_once
 
     def get_instance(
         self,
@@ -227,14 +254,14 @@ class LazyInstance:
         Get the instance.
 
         :param proxy: The lazy instance proxy
-        :param args: Arguments passed to the constructor during the
+        :param args: Positional arguments passed to the constructor during the
             initialization of the instance
         :param kwargs: Key-value arguments passed to the constructor during the
             initialization of the instance
         :return: the initialized or cached instance
 
         If the instance is not created or initialized or if it is to be needed
-        reinitialized, do it. *args* and *kwargs* are passed to the
+        reinitialized, do it. :arg:`args` and :arg:`kwargs` are passed to the
         constructor.
         """
         if proxy not in self.__cache or not self.__initialize_once:
@@ -243,10 +270,10 @@ class LazyInstance:
 
     def has_method(self, name: str) -> bool:
         """
-        Test whether the class has method *name*.
+        Test whether the class has method :arg:`name`.
 
         :param name: The name of the method
-        :return: `True` if the class has the method called *name*
+        :return: :obj:`True` if the class has the method called :arg:`name`
         """
         return callable(cast(object, getattr(self.__klass, name, None)))
 
@@ -254,7 +281,7 @@ class LazyInstance:
         """
         Create the proxy of the lazy instance.
 
-        :param args: Arguments passed to the constructor during the
+        :param args: Positional arguments passed to the constructor during the
             initialization of the instance
         :param kwargs: Key-value arguments passed to the constructor during the
             initialization of the instance
@@ -267,12 +294,17 @@ class AssertRaises:
     """
     Wrapper that asserts that callable raises.
 
+    :ivar __testcase: The test case
+    :ivar __func: The callable object to be tested
+    :ivar __raises: Expected exceptions
+    :ivar __exception: The caught exception
+
     Consider there are two functions ``func1`` and ``func2`` that are very
     similar to each other except ``func2`` raises an exception. Since their
     similarity, the test case defines a function ``run_and_verify(func)`` which
     runs them and test their results and side-effects. However, since ``func2``
     raises an exception, ``run_and_verify(func2)`` fails. To deal with such a
-    situation, `AssertRaises` can be used::
+    situation, :class:`.AssertRaises` can be used::
 
         class MyTestCase(CommonTestCase):
 
@@ -287,6 +319,10 @@ class AssertRaises:
                 self.assertEqual(wfunc2.get_exception().detail, "foo")
     """
 
+    __testcase: "TestCase"
+    __func: "FuncType"
+    __raises: "ExcSpecType"
+    __exception: "Exception | None"
     __slots__ = ("__testcase", "__func", "__raises", "__exception")
 
     def __init__(
@@ -297,14 +333,14 @@ class AssertRaises:
 
         :param testcase: The test case
         :param func: The callable object to be tested
-        :param raises: The expected exceptions
+        :param raises: Expected exceptions
         """
-        self.__testcase: "TestCase" = testcase
-        self.__func: "FuncType" = func
+        self.__testcase = testcase
+        self.__func = func
         if not isinstance(raises, tuple):
             raises = (raises,)
-        self.__raises: "ExcSpecType" = raises
-        self.__exception: "Exception | None" = None
+        self.__raises = raises
+        self.__exception = None
 
     def get_exception(self) -> "Exception | None":
         """
@@ -312,7 +348,8 @@ class AssertRaises:
 
         :return: the caught exception object
 
-        When called, *self* is cleared (the next call will return `None`).
+        When called, the caught exception storage is cleared (the next call
+        will return :obj:`None`).
         """
         exc: "Exception | None" = self.__exception
         self.__exception = None
@@ -325,9 +362,9 @@ class AssertRaises:
         :param args: Positional arguments
         :param kwargs: Key-value arguments
 
-        Invoke the callable object with *args* and *kwargs*, catch and store
-        the exception. Fail if the exception is not raised by the callable
-        object or if it is not in the list of expected exceptions.
+        Invoke the callable object with :arg:`args` and :arg:`kwargs`, catch
+        and store the exception. Fail if the exception is not raised by the
+        callable object or if it is not in the list of expected exceptions.
         """
         with self.__testcase.assertRaises(self.__raises) as catcher:
             self.__func(*args, **kwargs)
@@ -345,10 +382,10 @@ class TypingPatcher(PatcherFactory):
 
     def extend(self, target: str, symbols: Iterable[str]) -> None:
         """
-        Specify patches for *symbols*.
+        Specify patches for :arg:`target`.
 
         :param target: The target module
-        :param symbols: The list of symbols to be patched in the *target*
+        :param symbols: The list of symbols to be patched in the :arg:`target`
         """
         for symbol in symbols:
             self.add_spec(f"{target}.{symbol}", new=symbol, create=True)
@@ -384,9 +421,10 @@ def cover_typing(name: str, symbols: Iterable[str]) -> None:
 
         cover_typing("foo.bar", ["_TypeA", "_TypeB"])
 
-    Since this function uses `importlib.reload`, unpleasant side-effects may
-    occur. To avoid this, put your `cover_typing` code into separate file and
-    tell to ``pytest`` to run it as last (use ``pytest-order`` plugin) ::
+    Since this function uses :func:`importlib.reload`, unpleasant side-effects
+    may occur. To avoid this, put your :func:`.cover_typing` code into a
+    separate file and tell to ``pytest`` to run it as last (use
+    ``pytest-order`` plugin) ::
 
         import pytest
 
@@ -397,8 +435,8 @@ def cover_typing(name: str, symbols: Iterable[str]) -> None:
         def test_typing_code_is_covered():
             cover_typing("foo.bar", ["_TypeA", "_TypeB"])
     """
-    module = importlib.import_module(name)
-    patcher = TypingPatcher()
+    module: "ModuleType" = importlib.import_module(name)
+    patcher: "TypingPatcher" = TypingPatcher()
     patcher.extend(name.rsplit(".", 1)[0], symbols)
 
     with patcher.patch():

@@ -6,7 +6,16 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Test `vutils.testing.utils` module."""
+"""
+Test :mod:`vutils.testing.utils` module.
+
+.. |make_type| replace:: :func:`~vutils.testing.utils.make_type`
+.. |members| replace:: :arg:`members:vutils.testing.utils.make_type`
+.. |LazyInstance| replace:: :class:`~vutils.testing.utils.LazyInstance`
+.. |AssertRaises| replace:: :class:`~vutils.testing.utils.AssertRaises`
+.. |ClassLikeSymbol| replace:: :class:`~vutils.testing.utils.ClassLikeSymbol`
+.. |cover_typing| replace:: :func:`~vutils.testing.utils.cover_typing`
+"""
 
 import sys
 
@@ -16,11 +25,13 @@ from vutils.testing.utils import (
     AssertRaises,
     ClassLikeSymbol,
     LazyInstance,
+    cover_typing,
     make_type,
 )
 
 from .common import (
     FOO_CONSTANT,
+    CoverTypingPatcher,
     FooError,
     StderrPatcher,
     StderrWriter,
@@ -30,13 +41,13 @@ from .common import (
 
 
 class MakeTypeTestCase(TestCase):
-    """Test case for `make_type`."""
+    """Test case for |make_type|."""
 
     __slots__ = ()
 
     def verify_bases(self, klass, bases):
         """
-        Verify that *klass* has same bases as listed in *bases*.
+        Verify that :arg:`klass` has same bases as listed in :arg:`bases`.
 
         :param klass: The class
         :param bases: The list of base classes
@@ -46,13 +57,13 @@ class MakeTypeTestCase(TestCase):
             self.assertIs(klass.__bases__[i], base)
 
     def test_make_type_with_no_bases(self):
-        """Test `make_type` when called with no bases."""
+        """Test |make_type| when called with no bases."""
         new_type = make_type("NewType")
 
         self.verify_bases(new_type, [object])
 
     def test_make_type_with_one_base(self):
-        """Test `make_type` when called with one base."""
+        """Test |make_type| when called with one base."""
         error_a = make_type("ErrorA", Exception)
         error_b = make_type("ErrorB", (Exception,))
 
@@ -60,7 +71,7 @@ class MakeTypeTestCase(TestCase):
         self.verify_bases(error_b, [Exception])
 
     def test_make_type_with_more_bases(self):
-        """Test `make_type` when called with more bases."""
+        """Test |make_type| when called with more bases."""
         type_one = make_type("TypeOne")
         type_two = make_type("TypeTwo")
         type_three = make_type("TypeThree", (type_one, type_two))
@@ -68,7 +79,7 @@ class MakeTypeTestCase(TestCase):
         self.verify_bases(type_three, [type_one, type_two])
 
     def test_make_type_with_members(self):
-        """Test `make_type` when called with *members*."""
+        """Test |make_type| when called with |members|."""
         type_a = make_type("TypeA", members={"a": 1})
         type_b = make_type("TypeB", type_a, {"b": 2})
 
@@ -81,7 +92,7 @@ class MakeTypeTestCase(TestCase):
 
 
 class LazyInstanceTestCase(TestCase):
-    """Test case for `LazyInstance`."""
+    """Test case for |LazyInstance|."""
 
     __slots__ = ()
 
@@ -114,13 +125,13 @@ class LazyInstanceTestCase(TestCase):
 
 
 class AssertRaisesTestCase(TestCase):
-    """Test case for `AssertRaises`."""
+    """Test case for |AssertRaises|."""
 
     __slots__ = ()
 
     def run_and_verify(self, func):
         """
-        Run *func* and verify results.
+        Run :arg:`func` and verify results.
 
         :param func: The function to run
         """
@@ -129,7 +140,7 @@ class AssertRaisesTestCase(TestCase):
         self.assertEqual(mock.foo, FOO_CONSTANT)
 
     def test_assert_raises(self):
-        """Test `AssertRaises` works as expected."""
+        """Test |AssertRaises| works as expected."""
         wfunc_b = AssertRaises(self, func_b, FooError)
 
         self.run_and_verify(func_a)
@@ -139,14 +150,42 @@ class AssertRaisesTestCase(TestCase):
 
 
 class ClassLikeSymbolTestCase(TestCase):
-    """Test case for `ClassLikeSymbol`."""
+    """Test case for |ClassLikeSymbol|."""
 
     __slots__ = ()
 
     def test_repr_returns_class_name(self):
-        """Test whether `repr` returns a class name."""
+        """Test whether :func:`repr` returns a class name."""
 
         class DummySymbol(metaclass=ClassLikeSymbol):
             """Dummy symbol."""
 
         self.assertEqual(f"{DummySymbol}", DummySymbol.__name__)
+
+
+class CoverTypingTestCase(TestCase):
+    """Test case for |cover_typing|."""
+
+    __slots__ = ()
+
+    def test_cover_typing(self):
+        """Test |cover_typing| works as expected."""
+        module = "foo.bar.baz"
+        symbols = ["_TypeA", "_TypeB"]
+        patcher = CoverTypingPatcher()
+
+        with patcher.patch():
+            cover_typing(module, symbols)
+        self.assertEqual(
+            patcher.log,
+            [
+                ("start", ("typing.TYPE_CHECKING", (True,), {})),
+                ("start", ("foo.bar._TypeA", ("_TypeA",), {"create": True})),
+                ("start", ("foo.bar._TypeB", ("_TypeB",), {"create": True})),
+                ("reload", patcher.modules[module]),
+                ("stop", ("foo.bar._TypeB", ("_TypeB",), {"create": True})),
+                ("stop", ("foo.bar._TypeA", ("_TypeA",), {"create": True})),
+                ("stop", ("typing.TYPE_CHECKING", (True,), {})),
+                ("reload", patcher.modules[module]),
+            ],
+        )
