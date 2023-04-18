@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.0
+
+* Move the development status to production/stable
+* Code cleanup
+
 ## 0.6.2
 
 * Fix `safety` issues
