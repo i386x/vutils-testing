@@ -6,19 +6,27 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""Test `vutils.testing.testcase` module."""
+"""
+Test :mod:`vutils.testing.testcase` module.
+
+.. |TestCase| replace:: :class:`~vutils.testing.testcase.TestCase`
+.. |assert_called_with| replace::
+   :meth:`~vutils.testing.testcase.TestCase.assert_called_with`
+.. |assert_not_called| replace::
+   :meth:`~vutils.testing.testcase.TestCase.assert_not_called`
+"""
 
 from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
 
 
 class TestCaseTestCase(TestCase):
-    """Test case for `TestCase`."""
+    """Test case for |TestCase|."""
 
     __slots__ = ()
 
     def test_assert_called_with(self):
-        """Test `TestCase.assert_called_with` method."""
+        """Test |assert_called_with| method."""
         mock = make_mock(["foo"])
 
         mock.foo()
@@ -34,7 +42,7 @@ class TestCaseTestCase(TestCase):
         self.assert_called_with(mock.foo, 5, quux=6)
 
     def test_assert_not_called(self):
-        """Test `TestCase.assert_not_called` method."""
+        """Test |assert_not_called| method."""
         mock = make_mock(["foo"])
 
         self.assert_not_called(mock.foo)

@@ -28,25 +28,26 @@ else:
 
 def make_mock(*args: object, **kwargs: object) -> "Mock":
     """
-    Make the `unittest.mock.Mock` object.
+    Make the :class:`unittest.mock.Mock` object.
 
-    :param args: Positional arguments to be passed to the `unittest.mock.Mock`
-        constructor
-    :param kwargs: Key-value arguments to be passed to the `unittest.mock.Mock`
-        constructor
-    :return: the `unittest.mock.Mock` object
+    :param args: Positional arguments to be passed to the
+        :class:`unittest.mock.Mock` constructor
+    :param kwargs: Key-value arguments to be passed to the
+        :class:`unittest.mock.Mock` constructor
+    :return: the :class:`unittest.mock.Mock` object
     """
     return unittest.mock.Mock(*args, **kwargs)
 
 
 def make_callable(returns: "ReturnsType" = None) -> "Mock":
     """
-    Make the `unittest.mock.Mock` object that serves as a callable.
+    Make the :class:`unittest.mock.Mock` object that serves as a callable.
 
-    :param returns: If callable, *returns* is treated as the *side_effect*
-        parameter to `unittest.mock.Mock`. Otherwise, it is treated as the
-        *return_value* parameter
-    :return: the `unittest.mock.Mock` object representing the callable
+    :param returns: If callable, :arg:`returns` is treated as the
+        :arg:`side_effect:unittest.mock.Mock` parameter to
+        :class:`unittest.mock.Mock`. Otherwise, it is treated as
+        the :arg:`return_value:unittest.mock.Mock` parameter
+    :return: the :class:`unittest.mock.Mock` object representing the callable
     """
     if callable(returns):
         return unittest.mock.Mock(side_effect=returns)
@@ -54,8 +55,17 @@ def make_callable(returns: "ReturnsType" = None) -> "Mock":
 
 
 class PatchSpec:
-    """Holds the patch specification."""
+    """
+    Holds the patch specification.
 
+    :ivar __target: The target to be patched
+    :ivar __setupfunc: The setup function for the patch
+    :ivar __kwargs: Key-value arguments passed to :func:`unittest.mock.patch`
+    """
+
+    __target: object
+    __setupfunc: "SetupFuncType"
+    __kwargs: "KwArgsType"
     __slots__ = ("__target", "__setupfunc", "__kwargs")
 
     def __init__(
@@ -66,11 +76,12 @@ class PatchSpec:
 
         :param target: The target to be patched
         :param setupfunc: The function used to setup the patch
-        :param kwargs: Additional arguments passed to `unittest.mock.patch`
+        :param kwargs: Additional key-value arguments passed to
+            :func:`unittest.mock.patch`
         """
-        self.__target: object = target
-        self.__setupfunc: "SetupFuncType" = setupfunc
-        self.__kwargs: "KwArgsType" = kwargs
+        self.__target = target
+        self.__setupfunc = setupfunc
+        self.__kwargs = kwargs
 
     def __call__(self) -> "PatchType":
         """
@@ -80,13 +91,15 @@ class PatchSpec:
 
         The patcher is created in four steps:
 
-        #. `unittest.mock.Mock` object is created
-        #. if *new* is in *kwargs*, the mock object becomes *new*
-        #. if *setupfunc* is not `None`, the mock object is passed to it; the
-           *setupfunc* can then adjust the object
-        #. the patcher is created by calling `unittest.mock.patch` with
-           *target*, the mock object, and additional arguments given by
-           *kwargs*, respectively
+        #. :class:`unittest.mock.Mock` object is created
+        #. if *new* is in :arg:`kwargs:.PatchSpec.__init__`, the mock object
+           becomes *new*
+        #. if :arg:`setupfunc:.PatchSpec.__init__` is not :obj:`None`, the mock
+           object is passed to it; the :arg:`setupfunc:.PatchSpec.__init__` can
+           then adjust the object
+        #. the patcher is created by calling :func:`unittest.mock.patch` with
+           :arg:`target:.PatchSpec.__init__`, the mock object, and additional
+           arguments given by :arg:`kwargs:.PatchSpec.__init__`, respectively
         """
         kwargs: "KwArgsType" = self.__kwargs.copy()
         mock: "MockableType" = kwargs.pop("new", make_mock())
@@ -96,8 +109,13 @@ class PatchSpec:
 
 
 class PatchingContextManager:
-    """Context manager that handles the patching."""
+    """
+    Context manager that handles the patching.
 
+    :ivar __patchers: The list of patchers
+    """
+
+    __patchers: "list[PatchType]"
     __slots__ = ("__patchers",)
 
     def __init__(self, patchers: Iterable["PatchType"]) -> None:
@@ -106,13 +124,13 @@ class PatchingContextManager:
 
         :param patchers: The list of patchers
         """
-        self.__patchers: "list[PatchType]" = list(patchers)
+        self.__patchers = list(patchers)
 
     def __enter__(self) -> "PatchingContextManager":
         """
         Apply patches.
 
-        :return: *self*
+        :return: the instance that receives this method call (a.k.a *self*)
         """
         for patcher in self.__patchers:
             patcher.start()
@@ -132,11 +150,13 @@ class PatcherFactory:
     r"""
     Factory for creating patchers.
 
+    :ivar __specs: The list of patch specifications
+
     This factory allows to create and apply the set of patches simultaneously,
     omitting the nested ``with`` statements for every patch. In the following
     example, it is demonstrated how this class can be used to test the sending
     colored text to the standard output. First, define the factory that patch
-    the `colorama` and `sys` modules::
+    the :mod:`colorama` and :mod:`sys` modules::
 
         import colorama
         import io
@@ -176,14 +196,15 @@ class PatcherFactory:
             assert patcher.stream.getvalue() == f"<c:red>{message}</c>\n"
 
     The patches are applied in order as their specifications were added by
-    `add_spec`.
+    :meth:`~.PatcherFactory.add_spec`.
     """
 
+    __specs: "list[PatchSpec]"
     __slots__ = ("__specs",)
 
     def __init__(self) -> None:
         """Initialize the factory."""
-        self.__specs: "list[PatchSpec]" = []
+        self.__specs = []
         self.setup()
 
     def add_spec(
@@ -196,9 +217,11 @@ class PatcherFactory:
         Add the patch specification to the factory.
 
         :param target: The target to be patched
-        :param setupfunc: The function used to setup the patch, see `PatchSpec`
-        :param kwargs: Additional arguments to `unittest.mock.patch`
-        :return: *self*
+        :param setupfunc: The function used to setup the patch, see
+            :class:`.PatchSpec`
+        :param kwargs: Additional key-value arguments to
+            :func:`unittest.mock.patch`
+        :return: the instance that receives this method call (a.k.a *self*)
         """
         self.__specs.append(PatchSpec(target, setupfunc, **kwargs))
         return self
