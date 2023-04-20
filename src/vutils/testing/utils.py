@@ -9,12 +9,13 @@
 """Miscellaneous utilities."""
 
 import importlib
-from typing import TYPE_CHECKING, Iterable, cast
+from typing import TYPE_CHECKING, cast
 
 from vutils.testing.mock import PatcherFactory
 
 if TYPE_CHECKING:
     from types import ModuleType
+    from typing import Iterable
     from unittest import TestCase
 
     from vutils.testing import (
@@ -175,8 +176,9 @@ class LazyInstance:
 
     :ivar __cache: The lazy instance proxy to the instance mapping
     :ivar __klass: The class of the instance
-    :ivar __initialize_once: When :obj:`False`, :meth:`.get_instance` creates
-        a new instance every time when called
+    :ivar __initialize_once: When :obj:`False`,
+        :meth:`~.LazyInstance.get_instance` creates a new instance every time
+        when called
 
     Object is constructed/initialized at time when its member function is
     called. Example::
@@ -188,9 +190,9 @@ class LazyInstance:
     when ``test`` calls ``foo.quux``, ``Foo(1, bar=2)`` is invoked first
     to make the instance of ``Foo`` and to cache the instance inside
     ``foo_factory``. Then, from this instance, ``quux`` is invoked. Since
-    ``foo_factory`` was created with :attr:`.__initialize_once` property set
-    to :obj:`False`, ``foo`` is initialized every time when ``foo.quux`` is
-    invoked.
+    ``foo_factory`` was created with :attr:`~.LazyInstance.__initialize_once`
+    property set to :obj:`False`, ``foo`` is initialized every time when
+    ``foo.quux`` is invoked.
 
     The story behind :class:`.LazyInstance`: consider the following snippet of
     code::
@@ -380,7 +382,7 @@ class TypingPatcher(PatcherFactory):
         """Set up the patcher."""
         self.add_spec("typing.TYPE_CHECKING", new=True)
 
-    def extend(self, target: str, symbols: Iterable[str]) -> None:
+    def extend(self, target: str, symbols: "Iterable[str]") -> None:
         """
         Specify patches for :arg:`target`.
 
@@ -405,7 +407,7 @@ class ClassLikeSymbol(type):
         return cls.__name__
 
 
-def cover_typing(name: str, symbols: Iterable[str]) -> None:
+def cover_typing(name: str, symbols: "Iterable[str]") -> None:
     """
     Cover the ``if typing.TYPE_CHECKING`` branch.
 

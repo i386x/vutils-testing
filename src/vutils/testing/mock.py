@@ -9,9 +9,10 @@
 """Mocking utilities."""
 
 import unittest.mock
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing import Iterable
     from unittest.mock import Mock
 
     from vutils.testing import (
@@ -118,7 +119,7 @@ class PatchingContextManager:
     __patchers: "list[PatchType]"
     __slots__ = ("__patchers",)
 
-    def __init__(self, patchers: Iterable["PatchType"]) -> None:
+    def __init__(self, patchers: "Iterable[PatchType]") -> None:
         """
         Initialize the context manager.
 
@@ -140,7 +141,7 @@ class PatchingContextManager:
         """
         Revert applied patches in reverse order.
 
-        :param args: Unused arguments
+        :param args: Unused positional arguments
         """
         for patcher in reversed(self.__patchers):
             patcher.stop()
