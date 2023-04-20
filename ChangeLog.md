@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.2
+
+* Fix doc strings, slim imports
+
 ## 1.0.1
 
 * Remove unused `pytest-order` from `tox.ini`
