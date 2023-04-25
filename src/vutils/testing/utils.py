@@ -89,6 +89,7 @@ class LazyInstanceMethod:
 
     __owner: "LazyInstanceProxy"
     __name: str
+
     __slots__ = ("__owner", "__name")
 
     def __init__(self, owner: "LazyInstanceProxy", name: str) -> None:
@@ -125,6 +126,7 @@ class LazyInstanceProxy:
     __owner: "LazyInstance"
     __args: "ArgsType"
     __kwargs: "KwArgsType"
+
     __slots__ = ("__owner", "__args", "__kwargs")
 
     def __init__(
@@ -230,6 +232,7 @@ class LazyInstance:
     __cache: "dict[LazyInstanceProxy, object]"
     __klass: "TypeType"
     __initialize_once: bool
+
     __slots__ = ("__cache", "__klass", "__initialize_once")
 
     def __init__(
@@ -325,6 +328,7 @@ class AssertRaises:
     __func: "FuncType"
     __raises: "ExcSpecType"
     __exception: "Exception | None"
+
     __slots__ = ("__testcase", "__func", "__raises", "__exception")
 
     def __init__(
