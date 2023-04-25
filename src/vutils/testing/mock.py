@@ -67,6 +67,7 @@ class PatchSpec:
     __target: object
     __setupfunc: "SetupFuncType"
     __kwargs: "KwArgsType"
+
     __slots__ = ("__target", "__setupfunc", "__kwargs")
 
     def __init__(
@@ -117,6 +118,7 @@ class PatchingContextManager:
     """
 
     __patchers: "list[PatchType]"
+
     __slots__ = ("__patchers",)
 
     def __init__(self, patchers: "Iterable[PatchType]") -> None:
@@ -201,6 +203,7 @@ class PatcherFactory:
     """
 
     __specs: "list[PatchSpec]"
+
     __slots__ = ("__specs",)
 
     def __init__(self) -> None:
