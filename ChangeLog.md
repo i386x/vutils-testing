@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.3
+
+* Disable `pylint` `no-member` check
+* Constraint `requests` to safe version
+
 ## 1.0.2
 
 * Fix doc strings, slim imports
