@@ -8,14 +8,9 @@
 #
 """Miscellaneous utilities."""
 
-import importlib
 from typing import TYPE_CHECKING, cast
 
-from vutils.testing.mock import PatcherFactory
-
 if TYPE_CHECKING:
-    from types import ModuleType
-    from typing import Iterable
     from unittest import TestCase
 
     from vutils.testing import (
@@ -375,76 +370,3 @@ class AssertRaises:
         with self.__testcase.assertRaises(self.__raises) as catcher:
             self.__func(*args, **kwargs)
         self.__exception = catcher.exception
-
-
-class TypingPatcher(PatcherFactory):
-    """Patch type hints."""
-
-    __slots__ = ()
-
-    def setup(self) -> None:
-        """Set up the patcher."""
-        self.add_spec("typing.TYPE_CHECKING", new=True)
-
-    def extend(self, target: str, symbols: "Iterable[str]") -> None:
-        """
-        Specify patches for :arg:`target`.
-
-        :param target: The target module
-        :param symbols: The list of symbols to be patched in the :arg:`target`
-        """
-        for symbol in symbols:
-            self.add_spec(f"{target}.{symbol}", new=symbol, create=True)
-
-
-class ClassLikeSymbol(type):
-    """Meta class for class-like symbols."""
-
-    __slots__ = ()
-
-    def __repr__(cls) -> str:
-        """
-        Return the class-like symbol name.
-
-        :return: the class-like symbol name
-        """
-        return cls.__name__
-
-
-def cover_typing(name: str, symbols: "Iterable[str]") -> None:
-    """
-    Cover the ``if typing.TYPE_CHECKING`` branch.
-
-    :param name: The module name
-    :param symbols: The list of symbols
-
-    To make the code like ::
-
-        if typing.TYPE_CHECKING:
-            from foo import _TypeA, _TypeB
-
-    in ``foo.bar`` module covered by tests, call ::
-
-        cover_typing("foo.bar", ["_TypeA", "_TypeB"])
-
-    Since this function uses :func:`importlib.reload`, unpleasant side-effects
-    may occur. To avoid this, put your :func:`.cover_typing` code into a
-    separate file and tell to ``pytest`` to run it as last (use
-    ``pytest-order`` plugin) ::
-
-        import pytest
-
-        from vutils.testing.utils import cover_typing
-
-
-        @pytest.mark.order("last")
-        def test_typing_code_is_covered():
-            cover_typing("foo.bar", ["_TypeA", "_TypeB"])
-    """
-    module: "ModuleType" = importlib.import_module(name)
-    patcher: "TypingPatcher" = TypingPatcher()
-    patcher.extend(name.rsplit(".", 1)[0], symbols)
-
-    with patcher.patch():
-        importlib.reload(module)
-    importlib.reload(module)

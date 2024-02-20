@@ -103,60 +103,6 @@ with patcher.patch():
    do_something()
 ```
 
-### Covering `mypy` Specific Code
-
-When a module contains code that is visible only to `mypy`, it is not executed
-during unit tests and hence reported as not covered. Function `cover_typing`
-from `vutils.testing.utils` module has the ability to execute such a code and
-therefore improve coverage reports:
-```python
-# In foopkg/foo.py module:
-if typing.TYPE_CHECKING:
-    from foopkg import _A, _B, _C
-
-# In test_coverage.py:
-import pytest
-
-from vutils.testing.utils import cover_typing
-
-# Ensure the test run as last (this feature is available after installing
-# pytest-order). cover_typing reloads the module which may have negative
-# consequences on other tests
-@pytest.mark.order("last")
-def test_typing_code_is_covered():
-    # When called, following happens:
-    # - typing.TYPE_CHECKING is patched to True
-    # - foopkg is patched with _A, _B, and _C symbols if they do not exist
-    # - finally, foopkg.foo is reloaded
-    cover_typing("foopkg.foo", ["_A", "_B", "_C"])
-```
-The story behind `cover_typing` is to keep source files clean from directives
-telling the `pytest` and linters what to do.
-
-Sometimes a symbol can play two roles. Suppose that symbol `_L` is a type alias
-for `list[object]` when `mypy` is performing its checks and `list` otherwise:
-```python
-# In foopkg/foo.py module:
-if typing.TYPE_CHECKING:
-    from foopkg import _L
-else:
-    _L = list
-
-
-class ListType(_L):
-    pass
-```
-To cover this case, `ClassLikeSymbol` from `vutils.testing.utils` comes to
-help. In `test_coverage.py`, just define `_L` like
-```python
-class _L(metaclass=ClassLikeSymbol):
-    pass
-```
-and then pass it to `cover_typing`:
-```python
-cover_typing("foopkg.foo", [_L])
-```
-
 ### Deferred Instance Initialization
 
 Patching may take no effect if the patched object appears in constructor and
