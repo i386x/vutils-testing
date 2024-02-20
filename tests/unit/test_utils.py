@@ -13,25 +13,16 @@ Test :mod:`vutils.testing.utils` module.
 .. |members| replace:: :arg:`members:vutils.testing.utils.make_type`
 .. |LazyInstance| replace:: :class:`~vutils.testing.utils.LazyInstance`
 .. |AssertRaises| replace:: :class:`~vutils.testing.utils.AssertRaises`
-.. |ClassLikeSymbol| replace:: :class:`~vutils.testing.utils.ClassLikeSymbol`
-.. |cover_typing| replace:: :func:`~vutils.testing.utils.cover_typing`
 """
 
 import sys
 
 from vutils.testing.mock import make_mock
 from vutils.testing.testcase import TestCase
-from vutils.testing.utils import (
-    AssertRaises,
-    ClassLikeSymbol,
-    LazyInstance,
-    cover_typing,
-    make_type,
-)
+from vutils.testing.utils import AssertRaises, LazyInstance, make_type
 
 from .utils import (
     FOO_CONSTANT,
-    CoverTypingPatcher,
     FooError,
     StderrPatcher,
     StderrWriter,
@@ -147,45 +138,3 @@ class AssertRaisesTestCase(TestCase):
         self.run_and_verify(wfunc_b)
         self.assertEqual(wfunc_b.get_exception().detail, FOO_CONSTANT)
         self.assertIsNone(wfunc_b.get_exception())
-
-
-class ClassLikeSymbolTestCase(TestCase):
-    """Test case for |ClassLikeSymbol|."""
-
-    __slots__ = ()
-
-    def test_repr_returns_class_name(self):
-        """Test whether :func:`repr` returns a class name."""
-
-        class DummySymbol(metaclass=ClassLikeSymbol):
-            """Dummy symbol."""
-
-        self.assertEqual(f"{DummySymbol}", DummySymbol.__name__)
-
-
-class CoverTypingTestCase(TestCase):
-    """Test case for |cover_typing|."""
-
-    __slots__ = ()
-
-    def test_cover_typing(self):
-        """Test |cover_typing| works as expected."""
-        module = "foo.bar.baz"
-        symbols = ["_TypeA", "_TypeB"]
-        patcher = CoverTypingPatcher()
-
-        with patcher.patch():
-            cover_typing(module, symbols)
-        self.assertEqual(
-            patcher.log,
-            [
-                ("start", ("typing.TYPE_CHECKING", (True,), {})),
-                ("start", ("foo.bar._TypeA", ("_TypeA",), {"create": True})),
-                ("start", ("foo.bar._TypeB", ("_TypeB",), {"create": True})),
-                ("reload", patcher.modules[module]),
-                ("stop", ("foo.bar._TypeB", ("_TypeB",), {"create": True})),
-                ("stop", ("foo.bar._TypeA", ("_TypeA",), {"create": True})),
-                ("stop", ("typing.TYPE_CHECKING", (True,), {})),
-                ("reload", patcher.modules[module]),
-            ],
-        )
