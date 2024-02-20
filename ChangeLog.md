@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.0.0
+
+* Remove obsoleted classes/functions (`vutils.testing.utils`):
+  * `TypingPatcher`
+  * `ClassLikeSymbol`
+  * `cover_typing`
+
 ## 1.0.3
 
 * Disable `pylint` `no-member` check
