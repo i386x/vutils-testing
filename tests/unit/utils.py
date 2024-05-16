@@ -6,26 +6,19 @@
 #
 # SPDX-License-Identifier: MIT
 #
-"""
-Unit tests utilities.
-
-:const FOO_CONSTANT: The auxiliary constant used in tests
-"""
+"""Unit tests utilities."""
 
 import io
 import sys
 
 from vutils.testing.mock import PatcherFactory
 
+#: The auxiliary constant used in tests
 FOO_CONSTANT = 42
 
 
 class FooError(Exception):
-    """
-    Dummy exception.
-
-    :ivar detail: The error detail
-    """
+    """Dummy exception."""
 
     __slots__ = ("detail",)
 
@@ -36,32 +29,24 @@ class FooError(Exception):
         :param detail: The error detail
         """
         Exception.__init__(self, detail)
+        #: The error detail
         self.detail = detail
 
 
 class StderrPatcher(PatcherFactory):
-    """
-    :mod:`sys.stderr` patcher.
-
-    :ivar stream: The new error stream
-    """
+    """:mod:`sys.stderr` patcher."""
 
     __slots__ = ("stream",)
 
     def setup(self):
         """Set up the patcher."""
+        #: The new error stream
         self.stream = io.StringIO()
         self.add_spec("sys.stderr", new=self.stream)
 
 
 class StderrWriter:
-    """
-    Dummy standard error output writer.
-
-    :ivar stream: The error stream to write
-    :ivar code: The error code
-    :ivar label: The label of an error message
-    """
+    """Dummy standard error output writer."""
 
     __slots__ = ("stream", "code", "label")
 
@@ -72,8 +57,11 @@ class StderrWriter:
         :param code: The code
         :param label: The label
         """
+        #: The error stream to write
         self.stream = sys.stderr
+        #: The error code
         self.code = code
+        #: The label of an error message
         self.label = label
 
     @staticmethod

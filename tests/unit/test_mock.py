@@ -104,27 +104,24 @@ class MakeCallableTestCase(TestCase):
 
 
 class PatchXTestCaseBase(TestCase):
-    """
-    Base class for |PatchSpecTestCase| and |PatcherFactoryTestCase|.
-
-    :ivar mock: The :class:`unittest.mock.Mock` object used as an argument
-    :ivar patch: The mocked :func:`unittest.mock.patch`
-    :ivar patcher: The patcher
-    :ivar target: The target to be patched
-    """
+    """Base class for |PatchSpecTestCase| and |PatcherFactoryTestCase|."""
 
     __slots__ = ("mock", "patch", "patcher", "target")
 
     def setUp(self):
         """Set up the test."""
+        #: The :class:`unittest.mock.Mock` object used as an argument
         self.mock = make_mock()
         mock_mock = make_callable(lambda *x: self.mock)
+        #: The mocked :func:`unittest.mock.patch`
         self.patch = make_callable(lambda *x, **y: make_mock())
+        #: The patcher
         self.patcher = (
             PatcherFactory()
             .add_spec("vutils.testing.mock.make_patch", new=self.patch)
             .add_spec("unittest.mock.Mock", new=mock_mock)
         )
+        #: The target to be patched
         self.target = "__main__.print"
 
 
