@@ -56,16 +56,13 @@ def make_callable(returns: "ReturnsType" = None) -> "Mock":
 
 
 class PatchSpec:
-    """
-    Holds the patch specification.
+    """Holds the patch specification."""
 
-    :ivar __target: The target to be patched
-    :ivar __setupfunc: The setup function for the patch
-    :ivar __kwargs: Key-value arguments passed to :func:`unittest.mock.patch`
-    """
-
+    #: The target to be patched
     __target: object
+    #: The setup function for the patch
     __setupfunc: "SetupFuncType"
+    #: Key-value arguments passed to :func:`unittest.mock.patch`
     __kwargs: "KwArgsType"
 
     __slots__ = ("__target", "__setupfunc", "__kwargs")
@@ -111,12 +108,9 @@ class PatchSpec:
 
 
 class PatchingContextManager:
-    """
-    Context manager that handles the patching.
+    """Context manager that handles the patching."""
 
-    :ivar __patchers: The list of patchers
-    """
-
+    #: The list of patchers
     __patchers: "list[PatchType]"
 
     __slots__ = ("__patchers",)
@@ -152,8 +146,6 @@ class PatchingContextManager:
 class PatcherFactory:
     r"""
     Factory for creating patchers.
-
-    :ivar __specs: The list of patch specifications
 
     This factory allows to create and apply the set of patches simultaneously,
     omitting the nested ``with`` statements for every patch. In the following
@@ -202,6 +194,7 @@ class PatcherFactory:
     :meth:`~.PatcherFactory.add_spec`.
     """
 
+    #: The list of patch specifications
     __specs: "list[PatchSpec]"
 
     __slots__ = ("__specs",)

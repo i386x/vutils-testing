@@ -8,6 +8,7 @@
 #
 
 from collections.abc import Callable
+from typing import Protocol
 from unittest.mock import Mock, _patch
 
 from typing_extensions import TypeAlias
@@ -24,10 +25,10 @@ MembersType: TypeAlias = KwArgsType | None
 ExcSpecType: TypeAlias = ExcType | tuple[ExcType, ...]
 PatchType: TypeAlias = _patch[MockableType]
 
-class TypeType:
+class TypeType(Protocol):
     def __call__(self, *args: object, **kwargs: object) -> object: ...
 
-class FuncType:
+class FuncType(Protocol):
     def __call__(self, *args: object, **kwargs: object) -> object: ...
 
 def make_patch(

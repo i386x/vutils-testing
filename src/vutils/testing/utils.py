@@ -75,14 +75,11 @@ def make_type(
 
 
 class LazyInstanceMethod:
-    """
-    Lazy instance method.
+    """Lazy instance method."""
 
-    :ivar __owner: The lazy instance proxy
-    :ivar __name: The method name
-    """
-
+    #: The lazy instance proxy
     __owner: "LazyInstanceProxy"
+    #: The method name
     __name: str
 
     __slots__ = ("__owner", "__name")
@@ -110,16 +107,13 @@ class LazyInstanceMethod:
 
 
 class LazyInstanceProxy:
-    """
-    Lazy instance proxy.
+    """Lazy instance proxy."""
 
-    :ivar __owner: The lazy instance
-    :ivar __args: Positional arguments passed to the instance constructor
-    :ivar __kwargs: Key-value arguments passed to the instance constructor
-    """
-
+    #: The lazy instance
     __owner: "LazyInstance"
+    #: Positional arguments passed to the instance constructor
     __args: "ArgsType"
+    #: Key-value arguments passed to the instance constructor
     __kwargs: "KwArgsType"
 
     __slots__ = ("__owner", "__args", "__kwargs")
@@ -171,12 +165,6 @@ class LazyInstance:
     r"""
     Support lazy initialization.
 
-    :ivar __cache: The lazy instance proxy to the instance mapping
-    :ivar __klass: The class of the instance
-    :ivar __initialize_once: When :obj:`False`,
-        :meth:`~.LazyInstance.get_instance` creates a new instance every time
-        when called
-
     Object is constructed/initialized at time when its member function is
     called. Example::
 
@@ -224,8 +212,12 @@ class LazyInstance:
     now, ``Hello!\n`` is written to ``mystream`` as expected.
     """
 
+    #: The lazy instance proxy to the instance mapping
     __cache: "dict[LazyInstanceProxy, object]"
+    #: The class of the instance
     __klass: "TypeType"
+    #: When :obj:`False`, :meth:`~.LazyInstance.get_instance` creates a new
+    #: instance every time when called
     __initialize_once: bool
 
     __slots__ = ("__cache", "__klass", "__initialize_once")
@@ -294,11 +286,6 @@ class AssertRaises:
     """
     Wrapper that asserts that callable raises.
 
-    :ivar __testcase: The test case
-    :ivar __func: The callable object to be tested
-    :ivar __raises: Expected exceptions
-    :ivar __exception: The caught exception
-
     Consider there are two functions ``func1`` and ``func2`` that are very
     similar to each other except ``func2`` raises an exception. Since their
     similarity, the test case defines a function ``run_and_verify(func)`` which
@@ -319,9 +306,13 @@ class AssertRaises:
                 self.assertEqual(wfunc2.get_exception().detail, "foo")
     """
 
+    #: The test case
     __testcase: "TestCase"
+    #: The callable object to be tested
     __func: "FuncType"
+    #: Expected exceptions
     __raises: "ExcSpecType"
+    #: The caught exception
     __exception: "Exception | None"
 
     __slots__ = ("__testcase", "__func", "__raises", "__exception")
