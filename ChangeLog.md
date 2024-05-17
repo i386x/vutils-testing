@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0.1
+
+* Minor code cleanup
+
 ## 2.0.0
 
 * Remove obsoleted classes/functions (`vutils.testing.utils`):
