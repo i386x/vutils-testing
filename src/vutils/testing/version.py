@@ -9,4 +9,4 @@
 """Holds :mod:`vutils.testing` version."""
 
 #: The package version
-__version__: str = "2.0.1"
+__version__: str = "2.0.2"

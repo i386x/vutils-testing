@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0.2
+
+* Fix issues detected by linting
+
 ## 2.0.1
 
 * Minor code cleanup
