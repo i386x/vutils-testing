@@ -11,7 +11,7 @@
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
-    from unittest import TestCase
+    import unittest
 
     from vutils.testing import (
         ArgsType,
@@ -307,7 +307,7 @@ class AssertRaises:
     """
 
     #: The test case
-    __testcase: "TestCase"
+    __testcase: "unittest.TestCase"
     #: The callable object to be tested
     __func: "FuncType"
     #: Expected exceptions
@@ -318,7 +318,10 @@ class AssertRaises:
     __slots__ = ("__testcase", "__func", "__raises", "__exception")
 
     def __init__(
-        self, testcase: "TestCase", func: "FuncType", raises: "ExcSpecType"
+        self,
+        testcase: "unittest.TestCase",
+        func: "FuncType",
+        raises: "ExcSpecType",
     ) -> None:
         """
         Initialize the wrapper.
