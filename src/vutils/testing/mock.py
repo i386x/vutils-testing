@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Iterable
-    from unittest.mock import Mock
 
     from vutils.testing import (
         KwArgsType,
@@ -27,7 +26,7 @@ else:
     make_patch = unittest.mock.patch
 
 
-def make_mock(*args: object, **kwargs: object) -> "Mock":
+def make_mock(*args: object, **kwargs: object) -> "unittest.mock.Mock":
     """
     Make the :class:`unittest.mock.Mock` object.
 
@@ -40,7 +39,7 @@ def make_mock(*args: object, **kwargs: object) -> "Mock":
     return unittest.mock.Mock(*args, **kwargs)
 
 
-def make_callable(returns: "ReturnsType" = None) -> "Mock":
+def make_callable(returns: "ReturnsType" = None) -> "unittest.mock.Mock":
     """
     Make the :class:`unittest.mock.Mock` object that serves as a callable.
 

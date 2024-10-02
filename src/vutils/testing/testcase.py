@@ -12,7 +12,7 @@ import unittest
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from unittest.mock import Mock
+    import unittest.mock
 
 
 class TestCase(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestCase(unittest.TestCase):
 
     @staticmethod
     def assert_called_with(
-        mock: "Mock", *args: object, **kwargs: object
+        mock: "unittest.mock.Mock", *args: object, **kwargs: object
     ) -> None:
         """
         Check and reset the mock call.
@@ -38,7 +38,7 @@ class TestCase(unittest.TestCase):
         mock.reset_mock()
 
     @staticmethod
-    def assert_not_called(mock: "Mock") -> None:
+    def assert_not_called(mock: "unittest.mock.Mock") -> None:
         """
         Check that :arg:`mock` has not been called.
 
