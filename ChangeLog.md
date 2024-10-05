@@ -1,9 +1,5 @@
 # Change Log
 
-## 2.0.3
-
-* Drop universal wheels support due to deprecation notice
-
 ## 2.0.2
 
 * Fix issues detected by linting
