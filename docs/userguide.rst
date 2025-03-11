@@ -1,0 +1,4 @@
+User Guide
+==========
+
+Some examples.
